@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI × Excel 資料分析 | 互動教材與學習站台</title>
+  <meta name="description" content="用 AI 生成 Excel 試算表、看懂資料與選對圖表、AI 協作資料分析的互動教材。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-light: #eff6ff;
+      --slate-50: #f8fafc;
+      --slate-100: #f1f5f9;
+      --slate-200: #e2e8f0;
+      --slate-300: #cbd5e1;
+      --slate-600: #475569;
+      --slate-700: #334155;
+      --slate-800: #1e293b;
+      --slate-900: #0f172a;
+      --radius-lg: 16px;
+      --radius-md: 10px;
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.08), 0 2px 4px -2px rgba(0,0,0,0.04);
+      --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.03);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', 'Noto Sans TC', sans-serif;
+      background: #F8FAFC;
+      color: var(--slate-800);
+      line-height: 1.6;
+      padding-bottom: 80px;
+    }
+
+    /* 頂部導航 */
+    header {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--slate-200);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 1.2rem;
+      color: var(--slate-900);
+      text-decoration: none;
+    }
+
+    /* Hero */
+    .hero {
+      max-width: 960px;
+      margin: 48px auto 36px;
+      padding: 0 24px;
+      text-align: center;
+    }
+    .hero-badge {
+      display: inline-block;
+      padding: 5px 14px;
+      background: var(--primary-light);
+      border: 1px solid #bfdbfe;
+      border-radius: 999px;
+      color: var(--primary);
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+    .hero h1 {
+      font-size: 2.6rem;
+      font-weight: 900;
+      color: var(--slate-900);
+      letter-spacing: -0.03em;
+      margin-bottom: 14px;
+    }
+    .hero p {
+      font-size: 1.15rem;
+      color: var(--slate-600);
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    /* 主容器 */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .section-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--slate-900);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* 章節網格 */
+    .chapters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 24px;
+    }
+
+    .chapter-card {
+      background: #FFFFFF;
+      border: 1.5px solid var(--slate-200);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      box-shadow: var(--shadow-md);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.25s ease;
+      position: relative;
+    }
+    .chapter-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--primary);
+    }
+    .chapter-card.active-card {
+      border-color: var(--primary);
+      background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
+    }
+
+    .card-status {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 3px 10px;
+      border-radius: 999px;
+      margin-bottom: 12px;
+    }
+    .status-live { background: #ECFDF5; color: #059669; border: 1px solid #A7F3D0; }
+    .status-upcoming { background: #F1F5F9; color: #64748B; border: 1px solid #E2E8F0; }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--slate-900);
+      margin-bottom: 8px;
+    }
+    .card-desc {
+      font-size: 0.92rem;
+      color: var(--slate-600);
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+
+    .card-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: var(--primary);
+      color: #FFFFFF;
+      text-decoration: none;
+      padding: 10px 18px;
+      border-radius: var(--radius-md);
+      font-size: 0.92rem;
+      font-weight: 700;
+      transition: all 0.2s ease;
+    }
+    .card-btn:hover {
+      filter: brightness(1.1);
+    }
+
+    /* 頁尾 */
+    footer {
+      max-width: 1200px;
+      margin: 60px auto 0;
+      padding: 24px;
+      border-top: 1px solid var(--slate-200);
+      text-align: center;
+      color: var(--slate-600);
+      font-size: 0.9rem;
+    }
+    footer a { color: var(--primary); text-decoration: none; font-weight: 600; }
+  </style>
+</head>
+<body>
+
+  <!-- 頂部導航 -->
+  <header>
+    <div class="nav-container">
+      <a href="./index.html" class="logo">
+        <span>🤖 AI × Excel 資料分析</span>
+        <span style="font-size: 0.75rem; background: #2563EB; color: #fff; padding: 2px 8px; border-radius: 999px;">學習首頁</span>
+      </a>
+      <div>
+        <a href="https://github.com/roberthsu2003/ai-excel-analytics" target="_blank" style="text-decoration: none; font-size: 0.9rem; font-weight: 700; color: #475569;">GitHub 開源庫 ↗</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-badge">🚀 不寫程式也能做的資料分析</div>
+    <h1>讓 AI 做表、讓 AI 分析</h1>
+    <p>先學會說清楚需求，讓 Claude、ChatGPT、Gemini 直接產生 .xlsx 試算表；再學會看懂資料、問對問題，指揮 AI 完成分析與圖表。</p>
+  </section>
+
+  <!-- 章節目錄網格 -->
+  <main class="container">
+    <div class="section-title">
+      <span>📚</span>
+      <span>三部學習路線</span>
+    </div>
+
+    <div class="chapters-grid">
+
+      <!-- 第一部：用 AI 生成 Excel -->
+      <div class="chapter-card active-card">
+        <div>
+          <span class="card-status status-upcoming">📖 第一部・GitHub 教材</span>
+          <h2 class="card-title">📗 用 AI 生成 Excel 試算表</h2>
+          <p class="card-desc">前導核心＋五大階梯：基礎建表、資料防呆、髒資料清洗、跨表關聯、商業儀表板。學會開規格書，讓 AI 一次產出無合併儲存格、純數值、有公式的活檔案。</p>
+        </div>
+        <a href="https://github.com/roberthsu2003/workflow-productivity/blob/main/%E5%B8%B8%E8%A6%8B%E7%9A%84AI%E6%87%89%E7%94%A8/%E8%BE%A6%E5%85%AC%E5%AE%A4%E5%85%A8%E8%83%BD%E6%87%89%E7%94%A8/Excel%E8%A9%A6%E7%AE%97%E8%A1%A8%E7%9A%84%E7%94%9F%E6%88%90/README.md" target="_blank" class="card-btn">
+          <span>檢視五階漸進實戰指南</span>
+          <span>↗</span>
+        </a>
+      </div>
+
+      <!-- 第二部：看懂資料與選對圖表 -->
+      <div class="chapter-card active-card">
+        <div>
+          <span class="card-status status-live">🌟 第二部・互動專區</span>
+          <h2 class="card-title">📊 看懂資料與選對圖表</h2>
+          <p class="card-desc">辦公室人員必備的圖表思維！包含「五大問題動態動畫」、「15 種資料條件挑圖指南」與「7 大欄位組合速查工具」，建立從問題到特徵再到圖表的標準決策力。</p>
+        </div>
+        <a href="./chart-selection/index.html" class="card-btn">
+          <span>進入此章節互動專區</span>
+          <span>➔</span>
+        </a>
+      </div>
+
+      <!-- 第三部：AI 協作資料分析 -->
+      <div class="chapter-card active-card">
+        <div>
+          <span class="card-status status-live">🌟 第三部・互動專區</span>
+          <h2 class="card-title">🤖 AI 協作資料分析・14 個實作範例</h2>
+          <p class="card-desc">不用寫程式，在 Colab 指揮 AI 完成分析！從班級成績到法務部開放資料，14 個由淺至深的範例，每例只多學一件事，還能打勾記錄自己的學習進度。</p>
+        </div>
+        <a href="./ai-examples/index.html" class="card-btn">
+          <span>進入實戰範例專區</span>
+          <span>➔</span>
+        </a>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- 頁尾 -->
+  <footer>
+    <p>專案開源庫：<a href="https://github.com/roberthsu2003/ai-excel-analytics" target="_blank">roberthsu2003 / ai-excel-analytics</a></p>
+    <p style="margin-top: 6px; font-size: 0.85rem;">想看懂 AI 寫的程式？參考 <a href="https://github.com/roberthsu2003/PythonForDataAnalysis" target="_blank">PythonForDataAnalysis</a> 的 pandas 教材</p>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,18 @@
+[project]
+name = "ai-excel-analytics"
+version = "0.1.0"
+description = "AI × Excel 資料分析：用 AI 生成 Excel 試算表、看懂資料與選對圖表、AI 協作資料分析"
+requires-python = ">=3.11"
+dependencies = [
+    "matplotlib>=3.11.2",
+    "mplfonts>=0.0.11",
+    "numpy>=2.4.6",
+    "openpyxl>=3.1.5",
+    "pandas>=3.1.0",
+    "seaborn>=0.13.2",
+]
+
+[dependency-groups]
+dev = [
+    "ipykernel>=7.4.0",
+]

@@ -1,0 +1,22 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+
+# uv 虛擬環境
+.venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# 編輯器
+.vscode/
+.idea/
+
+# 環境變數（API 金鑰等）
+.env
+
+# 範例程式 make_report.py 產生的成果檔
+output/
