@@ -200,7 +200,7 @@ flowchart LR
 
 | 階段 | 範例 | 這一段學會的事 |
 | :--- | :--- | :--- |
-| 🟢 熟悉流程 | [01 班級段考成績](./AI協作資料分析/01_class_scores/README.md)・[02 便利商店銷售](./AI協作資料分析/02_store_sales/README.md) | 走一次完整五步驟；缺考不是 0 分；營收要自己算 |
+| 🟢 熟悉流程 | [01 班級段考成績](./AI協作資料分析/01_class_scores/README.md)・[02 便利商店銷售](./AI協作資料分析/02_store_sales/README.md) | 走一次完整三階提問；缺考不是 0 分；營收要自己算 |
 | 🔵 把亂資料整理乾淨 | [03 圖書館借閱](./AI協作資料分析/03_library_files/README.md)・[04 社區活動問卷](./AI協作資料分析/04_survey_cleaning/README.md)・[05 連鎖書店季報](./AI協作資料分析/05_bookstore_merge/README.md)・[06 縣市用電](./AI協作資料分析/06_power_reshape/README.md) | 讀對檔案、清理問卷、多表合併、長寬表轉換 |
 | 🟡 數對東西、算對指標 | [07 健身房會員](./AI協作資料分析/07_gym_groupby/README.md)・[08 外送訂單](./AI協作資料分析/08_delivery_time/README.md)・[09 六城市氣象](./AI協作資料分析/09_weather_charts/README.md)・[10 台北租屋](./AI協作資料分析/10_rent_seaborn/README.md)・[11 業務週報](./AI協作資料分析/11_sales_kpi_style/README.md) | 人次≠人數、時區換算、依問題換圖、異常值、分子分母 |
 | 🔴 自己來 | [12 共享單車（總整專題）](./AI協作資料分析/12_bike_capstone/README.md)・[13 辦公室資料](./AI協作資料分析/13_office_chart_basics/README.md)・[14 法務部公開統計](./AI協作資料分析/14_moj_public_data/README.md) | 綜合運用、五類問題各做一張、處理真實開放資料 |
