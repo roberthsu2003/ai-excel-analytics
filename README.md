@@ -73,7 +73,7 @@ flowchart LR
 
 📇 **一頁速查卡**（上課、做範例時放在旁邊，可列印）：[資料分析速查卡](./圖解/資料分析速查卡.svg)
 
-### 🗺️ 學習地圖：7 堂課＋動手做
+### 🗺️ 學習地圖：7 堂課由淺至深
 
 由淺至深，**一次一課，照順序通關**。讀完能說出「帶走的重點」就可以往下。
 
@@ -94,14 +94,8 @@ flowchart LR
   👉 📖 [決定適合圖表的思考規則](./決定適合圖表的思考規則/README.md)（附 15 個圖表 Colab 範例）
 
 #### 🟡 階段三：指揮 AI 產出（第 7 課）
-* **7️⃣ 和 AI 協作：三階提問法** ｜ 先讓 AI 看懂資料，再一次一張圖，最後說出限制  
-  👉 📖 [和 AI 協作的三階提問法](./和AI協作的三階提問法/README.md)
-
-#### 🔴 階段四：動手實作與挑戰
-* **✋ 動手做：五張圖由淺至深** ｜ 用同一份辦公室資料，把 7 堂課完整走一遍  
-  👉 💻 [README.ipynb](./README.ipynb)（[在 Colab 開啟](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/README.ipynb)）
-* **🚀 挑戰：陌生的真實資料** ｜ 拿到沒看過的空氣品質資料，自己走完整套流程  
-  👉 💻 [範例_陌生資料挑戰_空氣品質.ipynb](./學生素材/範例_陌生資料挑戰_空氣品質.ipynb)（[在 Colab 開啟](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/%E5%AD%B8%E7%94%9F%E7%B4%A0%E6%9D%90/%E7%AF%84%E4%BE%8B_%E9%99%8C%E7%94%9F%E8%B3%87%E6%96%99%E6%8C%91%E6%88%B0_%E7%A9%BA%E6%B0%A3%E5%93%81%E8%B3%AA.ipynb)）
+* **7️⃣ 和 AI 協作：三階提問法** ｜ 先讓 AI 看懂資料，再一次一張圖，最後說出限制與交付報告  
+  👉 📖 [和 AI 協作的三階提問法](./和AI協作的三階提問法/README.md)（附 3 個 Colab 實作演練）
 
 <details>
 <summary><b>📝 展開：每堂課的一頁重點摘要</b></summary>
