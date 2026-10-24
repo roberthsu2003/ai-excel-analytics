@@ -106,9 +106,8 @@
       gap: 12px;
     }
     .lesson {
-      display: block;
-      text-decoration: none;
-      color: inherit;
+      display: flex;
+      flex-direction: column;
       background: #fff;
       border: 1px solid var(--slate-200);
       border-left: 4px solid var(--stage, var(--primary));
@@ -118,13 +117,26 @@
     }
     .lesson:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
     .lesson .no { font-family: var(--mono); font-size: 0.78rem; font-weight: 700; color: var(--stage, var(--primary)); }
-    .lesson .name { font-weight: 800; color: var(--slate-900); margin: 2px 0; }
-    .lesson .what { font-size: 0.83rem; color: var(--slate-600); }
-    .lesson .files { font-size: 0.75rem; color: var(--slate-500); margin-top: 6px; }
+    .lesson .name { font-weight: 800; color: var(--slate-900); margin: 2px 0; text-decoration: none; }
+    .lesson .name:hover { color: var(--stage, var(--primary)); text-decoration: underline; }
+    .lesson .what { font-size: 0.83rem; color: var(--slate-600); flex: 1; }
+    .lesson .files { font-size: 0.75rem; color: var(--slate-500); margin-top: 8px; }
+    .lesson .download {
+      align-self: flex-start;
+      margin-top: 10px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #fff;
+      background: var(--stage, var(--primary));
+      text-decoration: none;
+      padding: 5px 12px;
+      border-radius: 6px;
+    }
+    .lesson .download:hover { filter: brightness(1.1); }
 
     .rules-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 14px;
     }
     .rule-card {
@@ -218,12 +230,13 @@
     <div id="lessonMap"></div>
 
     <section class="panel" style="margin-top: 16px;">
-      <h2 class="section-title"><span>🔑</span> 貫穿全部的四條鐵律</h2>
+      <h2 class="section-title"><span>🔑</span> 貫穿全部的五條鐵律</h2>
       <div class="rules-grid">
         <div class="rule-card"><b>1. 資料列不合併</b><p>一列就是一筆，才能排序、篩選、樞紐分析。</p></div>
         <div class="rule-card"><b>2. 型態要對</b><p>金額是數值（不打「元」），日期是日期，要保留 0 的編號存成文字。</p></div>
         <div class="rule-card"><b>3. 公式優先</b><p>算出來的都用公式，不填死值。</p></div>
         <div class="rule-card"><b>4. 資料和報表分開</b><p>明細放資料層，總計與圖表放展示層。</p></div>
+        <div class="rule-card"><b>5. 會新增資料就用表格</b><p>結構化表格＋計算欄位 <code>[@欄位]</code>，新增一筆不用重寫公式。</p></div>
       </div>
     </section>
 
@@ -235,6 +248,8 @@
 
   <script>
     const BASE = "https://github.com/roberthsu2003/ai-excel-analytics/tree/main/01_用AI生成Excel/";
+    // github.com/.../raw/... 會直接下載檔案
+    const RAW = "https://github.com/roberthsu2003/ai-excel-analytics/raw/main/01_用AI生成Excel/";
     const stages = [
       { title: "🧠 先備：看懂規範書的基礎", note: "不用打開 Excel", color: "#64748b", lessons: [
         ["00", "Excel 基本觀念", "00_Excel基本觀念", "名詞、資料型態、公式、錯誤代碼", "文字教材"],
@@ -244,7 +259,7 @@
         ["01", "儲存格與資料型態", "01_儲存格與資料型態", "值 vs. 顯示格式；文字、數值、日期", "社團收支紀錄.xlsx"],
         ["02", "公式與參照", "02_公式與參照", "相對參照 vs. $ 絕對參照", "商品報價單.xlsx"],
         ["03", "常用函數", "03_常用函數", "SUM、AVERAGE、COUNT；空白 ≠ 0", "班級成績表.xlsx"],
-        ["04", "一列一筆與結構化表格", "04_一列一筆與結構化表格", "四不二要；Excel Table", "部門費用報銷表.xlsx"]
+        ["04", "一列一筆與結構化表格", "04_一列一筆與結構化表格", "四不二要；固定範圍 vs. 表格", "部門費用報銷表.xlsx"]
       ]},
       { title: "🟡 階段二：判斷、防呆與警示", note: "第 05～07 課", color: "#d97706", lessons: [
         ["05", "邏輯判斷", "05_邏輯判斷", "IF、IFS、AND；規則表", "業績獎金判定.xlsx"],
@@ -266,12 +281,14 @@
         <div class="stage-head"><h3>${s.title}</h3><span>${s.note}</span></div>
         <div class="lesson-grid">
           ${s.lessons.map(([no, name, folder, what, files]) => `
-            <a class="lesson" href="${BASE}${folder}" target="_blank" rel="noopener">
+            <div class="lesson">
               <div class="no">${no === "00" ? "先備" : "第 " + no + " 課"}</div>
-              <div class="name">${name}</div>
+              <a class="name" href="${BASE}${folder}" target="_blank" rel="noopener">${name} ↗</a>
               <div class="what">${what}</div>
-              <div class="files">📗 ${files}</div>
-            </a>`).join("")}
+              ${files.endsWith(".xlsx")
+                ? `<a class="download" href="${RAW}${encodeURI(folder + "/" + files)}" download>⬇️ 下載 ${files}</a>`
+                : `<div class="files">📄 ${files}</div>`}
+            </div>`).join("")}
         </div>
       </div>`).join("");
   </script>

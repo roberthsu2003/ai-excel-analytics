@@ -11,7 +11,7 @@
 | 新名詞 | 主檔（Master Table）、主鍵（唯一編號）、`XLOOKUP`、查無資料的處理、`COUNTIF`、三層分工 |
 | 情境 | 3C 用品訂單 15 筆 + 產品主檔 8 項 |
 | 📄 規範書 | [規範書_訂單與產品主檔.md](./規範書_訂單與產品主檔.md) |
-| 📗 觀察檔案 | [訂單與產品主檔.xlsx](./訂單與產品主檔.xlsx) |
+| 📗 觀察檔案 | ⬇️ [下載 訂單與產品主檔.xlsx](https://github.com/roberthsu2003/ai-excel-analytics/raw/main/01_%E7%94%A8AI%E7%94%9F%E6%88%90Excel/08_%E4%B8%BB%E6%AA%94%E8%88%87%E8%B7%A8%E8%A1%A8%E6%9F%A5%E8%A9%A2/%E8%A8%82%E5%96%AE%E8%88%87%E7%94%A2%E5%93%81%E4%B8%BB%E6%AA%94.xlsx)　｜　👀 [在 GitHub 預覽](./訂單與產品主檔.xlsx) |
 | 🎬 動畫 | [XLOOKUP 查找動畫](https://roberthsu2003.github.io/ai-excel-analytics/excel-generation/formula-reference.html) |
 
 ---
@@ -31,9 +31,9 @@
 ## 3️⃣ XLOOKUP 怎麼讀
 
 ```
-=XLOOKUP( C2 , T_Product[產品編號] , T_Product[產品名稱] , "查無此編號" )
-          ①         ②                    ③                    ④
-① 要找什麼：這筆訂單的產品編號
+=XLOOKUP( [@產品編號] , T_Product[產品編號] , T_Product[產品名稱] , "查無此編號" )
+              ①                 ②                    ③                    ④
+① 要找什麼：這一列（這筆訂單）的產品編號
 ② 去哪裡找：主檔的「產品編號」欄
 ③ 找到後回傳什麼：同一列的「產品名稱」
 ④ 找不到時顯示什麼
@@ -53,7 +53,9 @@
 
 ## 5️⃣ 打開 xlsx 觀察
 
-- [ ] 點訂單明細 **E2**：`=XLOOKUP(C2,T_Product[產品編號],T_Product[產品名稱],"查無此編號")`。
+> ⬇️ **先下載檔案**：[訂單與產品主檔.xlsx](https://github.com/roberthsu2003/ai-excel-analytics/raw/main/01_%E7%94%A8AI%E7%94%9F%E6%88%90Excel/08_%E4%B8%BB%E6%AA%94%E8%88%87%E8%B7%A8%E8%A1%A8%E6%9F%A5%E8%A9%A2/%E8%A8%82%E5%96%AE%E8%88%87%E7%94%A2%E5%93%81%E4%B8%BB%E6%AA%94.xlsx)。下載後用 Excel 打開；在 GitHub 網頁上預覽看不到公式和格式。
+
+- [ ] 點訂單明細 **E2**：`=XLOOKUP([@產品編號],T_Product[產品編號],T_Product[產品名稱],"查無此編號")`。`[@產品編號]` 就是「這一列的產品編號」。
 - [ ] 對照：O-0001 的 `P-003`，到「產品主檔」找到 27 吋螢幕、6,990，和 E2、G2 一致。
 - [ ] 看第 7 列 **O-0006**：`P-999` 查不到，整列紅底，產品名稱「查無此編號」，小計 0。
 - [ ] 切到「訂單彙總」：營收總計 **112,710**、查無編號筆數 **1**。

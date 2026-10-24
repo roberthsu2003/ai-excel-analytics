@@ -11,6 +11,7 @@ from datetime import date, datetime
 from pathlib import Path
 
 from openpyxl import load_workbook
+from openpyxl.utils import column_index_from_string, range_boundaries
 
 ROOT = Path(__file__).resolve().parent.parent / "01_用AI生成Excel"
 
@@ -29,11 +30,12 @@ SPECS = {
         "各科統計": {"rows": (2, 6), "formula": "BCD"},
     },
     "04_一列一筆與結構化表格/部門費用報銷表.xlsx": {
-        "報銷明細": {"rows": (2, 11), "date": "B", "number": "GH", "formula": "I", "tables": 1},
+        "報銷明細": {"rows": (2, 11), "date": "B", "number": "GH", "formula": "I", "tables": 1, "calc": "I"},
         "報銷彙總": {"rows": (2, 4), "formula": "B"},
+        "固定範圍對照": {"rows": (2, 12), "date": "B", "number": "GH", "formula": "I", "tables": 0},
     },
     "05_邏輯判斷/業績獎金判定.xlsx": {
-        "業績": {"rows": (2, 13), "number": "DE", "formula": "GHIJ", "tables": 1},
+        "業績": {"rows": (2, 13), "number": "DE", "formula": "GHIJ", "tables": 1, "calc": "GHIJ"},
         "獎金規則": {"rows": (2, 4), "number": "B"},
     },
     "06_資料驗證/請假申請表.xlsx": {
@@ -42,12 +44,12 @@ SPECS = {
     },
     "07_條件式格式/專案進度管控表.xlsx": {
         "專案進度": {"rows": (2, 13), "date": "D", "number": "FGH", "formula": "IJ",
-                 "tables": 1, "cf_rules": 4},
+                 "tables": 1, "cf_rules": 4, "calc": "IJ"},
         "設定": {"rows": (1, 1), "date": "B"},
     },
     "08_主檔與跨表查詢/訂單與產品主檔.xlsx": {
         "訂單明細": {"rows": (2, 16), "date": "B", "number": "D", "formula": "EFGH",
-                 "tables": 1, "cf_rules": 1},
+                 "tables": 1, "cf_rules": 1, "calc": "EFGH"},
         "產品主檔": {"rows": (2, 9), "number": "DE", "tables": 1},
         "訂單彙總": {"rows": (2, 4), "formula": "B"},
     },
@@ -57,15 +59,15 @@ SPECS = {
     },
     "10_髒資料清洗/採購需求清洗.xlsx": {
         "原始訊息": {"rows": (2, 11), "text": "B"},
-        "清洗後": {"rows": (2, 11), "date": "B", "number": "FH", "text": "G", "formula": "I", "tables": 1},
+        "清洗後": {"rows": (2, 11), "date": "B", "number": "FH", "text": "G", "formula": "I", "tables": 1, "calc": "I"},
     },
     "11_圖表/月營收圖表.xlsx": {
-        "月營收": {"rows": (2, 13), "date": "A", "number": "BC", "formula": "D"},
-        "季彙總": {"rows": (2, 5), "formula": "BCD"},
+        "月營收": {"rows": (2, 13), "date": "A", "number": "BC", "formula": "D", "tables": 1, "calc": "D"},
+        "季彙總": {"rows": (2, 5), "date": "B", "formula": "CDE"},
         "圖表": {"rows": (1, 1), "charts": 3},
     },
     "12_主管儀表板總整/全通路營運儀表板.xlsx": {
-        "銷售明細": {"rows": (2, 61), "date": "B", "number": "EF", "formula": "G", "tables": 1},
+        "銷售明細": {"rows": (2, 61), "date": "B", "number": "EF", "formula": "G", "tables": 1, "calc": "G"},
         "計算": {"rows": (2, 4), "date": "A", "formula": "BC"},
         "儀表板": {"rows": (4, 4), "formula": "ADGJ", "charts": 2, "allow_merge": True},
     },
@@ -125,6 +127,23 @@ def check_file(rel, sheets):
                     if m:
                         errors.append(f"{name}!{cell.coordinate} 的 {m.group(1)} 缺少 _xlfn. 前綴")
 
+        # 計算欄位：表格定義有公式，且每一列都用同一個 [#This Row] 公式（新增列時 Excel 會自動帶出）
+        for col in spec.get("calc", ""):
+            table = next(iter(ws.tables.values()), None)
+            if table is None:
+                errors.append(f"{name}：{col} 欄應為表格計算欄位，但沒有表格")
+                continue
+            min_col = range_boundaries(table.ref)[0]
+            tcol = table.tableColumns[column_index_from_string(col) - min_col]
+            formula = tcol.calculatedColumnFormula.attr_text if tcol.calculatedColumnFormula else None
+            if not formula or "[#This Row]" not in formula:
+                errors.append(f"{name}：{col} 欄（{tcol.name}）沒有登記為計算欄位")
+                continue
+            for r in range(start, end + 1):
+                if ws[f"{col}{r}"].value != "=" + formula:
+                    errors.append(f"{name}!{col}{r} 與計算欄位公式不一致")
+                    break
+
         for table in ws.tables.values():
             # 總計等彙總值不可落在表格範圍內（避免排序、篩選時被當成一筆資料）
             last_row = int(re.sub(r"\D", "", table.ref.split(":")[1]))
@@ -153,6 +172,7 @@ def recompute():
     return {
         "02 未稅合計／稅額合計／含稅總額": f"{subtotal:,}／{tax:,}／{subtotal + tax:,}",
         "04 報銷總計金額": f"{sum(r[6] * r[7] for r in b.EXPENSES):,}",
+        "04 固定範圍對照：漏算金額": f"{b.EXTRA_EXPENSE[6] * b.EXTRA_EXPENSE[7]:,}",
         "05 獎金等級 A/B/C/無": "/".join(str(grades.count(g)) for g in ("A", "B", "C", "無")),
         "05 全勤加碼人數": extra,
         "07 逾期任務／超支任務": f"{overdue}／{over_budget}",

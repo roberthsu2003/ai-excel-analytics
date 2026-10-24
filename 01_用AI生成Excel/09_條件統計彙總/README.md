@@ -11,7 +11,7 @@
 | 新名詞 | `COUNTIFS`、`SUMIFS`、`EDATE`、交叉表（矩陣）、混合參照 `$A9`／`B$8`、樞紐分析表 |
 | 情境 | 第一季三個通路 45 筆訂單 |
 | 📄 規範書 | [規範書_多通路銷售彙總.md](./規範書_多通路銷售彙總.md) |
-| 📗 觀察檔案 | [多通路銷售彙總.xlsx](./多通路銷售彙總.xlsx) |
+| 📗 觀察檔案 | ⬇️ [下載 多通路銷售彙總.xlsx](https://github.com/roberthsu2003/ai-excel-analytics/raw/main/01_%E7%94%A8AI%E7%94%9F%E6%88%90Excel/09_%E6%A2%9D%E4%BB%B6%E7%B5%B1%E8%A8%88%E5%BD%99%E7%B8%BD/%E5%A4%9A%E9%80%9A%E8%B7%AF%E9%8A%B7%E5%94%AE%E5%BD%99%E7%B8%BD.xlsx)　｜　👀 [在 GitHub 預覽](./多通路銷售彙總.xlsx) |
 
 ---
 
@@ -56,6 +56,8 @@
 | **C7 預期結果表** | 每一格都能對答案 |
 
 ## 5️⃣ 打開 xlsx 觀察
+
+> ⬇️ **先下載檔案**：[多通路銷售彙總.xlsx](https://github.com/roberthsu2003/ai-excel-analytics/raw/main/01_%E7%94%A8AI%E7%94%9F%E6%88%90Excel/09_%E6%A2%9D%E4%BB%B6%E7%B5%B1%E8%A8%88%E5%BD%99%E7%B8%BD/%E5%A4%9A%E9%80%9A%E8%B7%AF%E9%8A%B7%E5%94%AE%E5%BD%99%E7%B8%BD.xlsx)。下載後用 Excel 打開；在 GitHub 網頁上預覽看不到公式和格式。
 
 - [ ] 點通路彙總 **C2**：`=SUMIFS(T_Sales[銷售金額],T_Sales[通路],$A2)`，門市 **91,360**。
 - [ ] 看 **D 欄**：官網筆數最少，平均客單價最高（8,951）。

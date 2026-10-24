@@ -9,8 +9,8 @@ from pathlib import Path
 
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font, PatternFill
-from openpyxl.utils import get_column_letter
-from openpyxl.worksheet.table import Table, TableStyleInfo
+from openpyxl.utils import get_column_letter, range_boundaries
+from openpyxl.worksheet.table import Table, TableFormula, TableStyleInfo
 
 ROOT = Path(__file__).resolve().parent.parent / "01_用AI生成Excel"
 
@@ -56,9 +56,28 @@ def label(ws, ref, text):
     cell.fill = LABEL_FILL
 
 
-def add_table(ws, ref, name):
+def add_table(ws, ref, name, calc=None):
+    """建立結構化表格。
+
+    calc 是 {欄位名稱: 公式樣板}，樣板用 {欄位} 代表「同一列的該欄位」，例如
+    {"小計金額": "{單價}*{數量}"}。這些欄會登記成表格的「計算欄位」並寫入每一列，
+    Excel 顯示為 =[@單價]*[@數量]；新增列時 Excel 會自動帶出公式，不必重寫。
+    """
     table = Table(displayName=name, ref=ref)
     table.tableStyleInfo = TableStyleInfo(name="TableStyleMedium2", showRowStripes=True)
+    table._initialise_columns()
+    min_col, min_row, max_col, max_row = range_boundaries(ref)
+    headers = [ws.cell(row=min_row, column=c).value for c in range(min_col, max_col + 1)]
+    for col, header in zip(table.tableColumns, headers):
+        col.name = header
+    # 檔案內「同一列」的完整寫法是 表格[[#This Row],[欄位]]，Excel 會顯示成 [@欄位]
+    this_row = {h: f"{name}[[#This Row],[{h}]]" for h in headers}
+    for header, template in (calc or {}).items():
+        formula = template.format(**this_row)
+        idx = headers.index(header)
+        table.tableColumns[idx].calculatedColumnFormula = TableFormula(attr_text=formula)
+        for r in range(min_row + 1, max_row + 1):
+            ws.cell(row=r, column=min_col + idx, value="=" + formula)
     ws.add_table(table)
 
 
@@ -236,6 +255,9 @@ EXPENSES = [
     ("EXP-2026-009", date(2026, 3, 22), "業務部", "黃俊傑", "交通差旅", "業務拜訪油資與過路費", 1450, 1, "AJ-88990011", "附里程表"),
     ("EXP-2026-010", date(2026, 3, 25), "管理部", "劉美琪", "會議雜費", "季會茶點", 280, 15, "AK-22334455", ""),
 ]
+# 「固定範圍對照」工作表裡新增的第 11 筆
+EXTRA_EXPENSE = ("EXP-2026-011", date(2026, 3, 28), "研發部", "王思婷", "交通差旅", "客戶拜訪計程車資",
+                 350, 2, "AL-55443322", "")
 
 
 def build_04():
@@ -245,15 +267,12 @@ def build_04():
     headers = ["報銷序號", "報銷日期", "申請部門", "申請人", "費用類別", "支出項目說明",
                "單價", "數量", "小計金額", "發票號碼", "審核備註"]
     write_header(ws, 1, headers)
-    rows = []
-    for i, (no, d, dept, who, cat, desc, price, qty, inv, note) in enumerate(EXPENSES):
-        r = 2 + i
-        rows.append((no, d, dept, who, cat, desc, price, qty, f"=G{r}*H{r}", inv, note))
+    rows = [e[:8] + (None,) + e[8:] for e in EXPENSES]  # 小計由 add_table 寫入計算欄位
     write_rows(ws, 2, rows, {2: DATE, 7: AMOUNT, 8: AMOUNT, 9: AMOUNT})
     for r in range(2, 2 + len(rows)):
         ws.cell(row=r, column=6).alignment = Alignment(wrap_text=True, vertical="top")
     last = 1 + len(rows)
-    add_table(ws, f"A1:K{last}", "T_Expense")
+    add_table(ws, f"A1:K{last}", "T_Expense", calc={"小計金額": "{單價}*{數量}"})
     set_widths(ws, [15, 12, 10, 9, 11, 32, 9, 7, 11, 14, 12])
     ws.freeze_panes = "A2"
 
@@ -271,6 +290,39 @@ def build_04():
         cell.font = BODY_FONT
         summary.cell(row=r, column=3, value=note).font = NOTE_FONT
     set_widths(summary, [16, 14, 36])
+
+    # 對照：同樣的資料放在「一般範圍」，新增第 11 筆後，寫死範圍的總計漏算
+    fixed = wb.create_sheet("固定範圍對照")
+    write_header(fixed, 1, headers)
+    fixed_rows = [e[:8] + (f"=G{2 + i}*H{2 + i}",) + e[8:]
+                  for i, e in enumerate(EXPENSES + [EXTRA_EXPENSE])]
+    write_rows(fixed, 2, fixed_rows, {2: DATE, 7: AMOUNT, 8: AMOUNT, 9: AMOUNT})
+    new_row = 1 + len(fixed_rows)
+    for c in range(1, len(headers) + 1):
+        fixed.cell(row=new_row, column=c).fill = PatternFill("solid", fgColor="FFF2CC")
+    set_widths(fixed, [15, 12, 10, 9, 11, 32, 9, 7, 11, 14, 12, 3, 30, 14])
+    fixed.freeze_panes = "A2"
+    notes = [
+        ("M1", "對照項目", None), ("N1", "數值", None),
+        ("M2", "固定範圍總計 =SUM(I2:I11)", f"=SUM(I2:I{new_row - 1})"),
+        ("M3", "實際應有總計（含第 12 列）", f"=SUM(I2:I{new_row})"),
+        ("M4", "漏算的金額", "=N3-N2"),
+    ]
+    for ref, text, formula in notes:
+        fixed[ref] = text
+        fixed[ref].font = Font(name=FONT_NAME, bold=True)
+        if formula:
+            value = fixed["N" + ref[1:]]
+            value.value = formula
+            value.number_format = AMOUNT
+    for ref in ("M1", "N1"):
+        fixed[ref].font = HEADER_FONT
+        fixed[ref].fill = HEADER_FILL
+    fixed["N4"].font = Font(name=FONT_NAME, bold=True, color="C00000")
+    fixed["M6"] = "第 12 列（黃底）是新增的一筆。總計公式是在 10 筆時寫的，範圍沒有跟著長大。"
+    fixed["M7"] = "「報銷明細」用結構化表格：新增列會自動帶出小計，SUM(T_Expense[小計金額]) 也自動算進去。"
+    for ref in ("M6", "M7"):
+        fixed[ref].font = NOTE_FONT
 
     wb.save(lesson_path("04_一列一筆與結構化表格", "部門費用報銷表.xlsx"))
 
@@ -300,18 +352,16 @@ def build_05():
     write_header(ws, 1, ["員工編號", "姓名", "部門", "業績目標", "實際業績", "全勤",
                          "達成率", "是否達標", "獎金等級", "全勤加碼"])
     rule = "'獎金規則'!"
-    rows = []
-    for i, rep in enumerate(SALES_REPS):
-        r = 2 + i
-        rows.append(rep + (
-            f"=E{r}/D{r}",
-            f'=IF(G{r}>={rule}$B$3,"達標","未達標")',
-            # IFS 是 Excel 2019 起的新函數，檔案內必須寫成 _xlfn.IFS
-            f'=_xlfn.IFS(G{r}>={rule}$B$2,"A",G{r}>={rule}$B$3,"B",G{r}>={rule}$B$4,"C",TRUE,"無")',
-            f'=IF(AND(H{r}="達標",F{r}="是"),"是","否")',
-        ))
+    rows = [rep + (None,) * 4 for rep in SALES_REPS]
     write_rows(ws, 2, rows, {4: AMOUNT, 5: AMOUNT, 7: "0.0%"})
-    add_table(ws, f"A1:J{1 + len(rows)}", "T_Bonus")
+    add_table(ws, f"A1:J{1 + len(rows)}", "T_Bonus", calc={
+        "達成率": "{實際業績}/{業績目標}",
+        "是否達標": f'IF({{達成率}}>={rule}$B$3,"達標","未達標")',
+        # IFS 是 Excel 2019 起的新函數，檔案內必須寫成 _xlfn.IFS
+        "獎金等級": f'_xlfn.IFS({{達成率}}>={rule}$B$2,"A",{{達成率}}>={rule}$B$3,"B",'
+                    f'{{達成率}}>={rule}$B$4,"C",TRUE,"無")',
+        "全勤加碼": 'IF(AND({是否達標}="達標",{全勤}="是"),"是","否")',
+    })
     set_widths(ws, [10, 9, 10, 11, 11, 7, 9, 10, 10, 10])
     ws.freeze_panes = "C2"
 
@@ -419,13 +469,15 @@ def build_07():
     ws.title = "專案進度"
     write_header(ws, 1, ["任務編號", "任務名稱", "負責人", "截止日", "狀態", "完成進度",
                          "預算", "實際支出", "剩餘預算", "預算使用率"])
-    rows = []
-    for i, task in enumerate(TASKS):
-        r = 2 + i
-        rows.append(task + (f"=G{r}-H{r}", f"=IF(G{r}=0,0,H{r}/G{r})"))
+    rows = [task + (None, None) for task in TASKS]
     write_rows(ws, 2, rows, {4: DATE, 6: "0%", 7: AMOUNT, 8: AMOUNT, 9: AMOUNT, 10: "0%"})
     last = 1 + len(rows)
-    add_table(ws, f"A1:J{last}", "T_Project")
+    add_table(ws, f"A1:J{last}", "T_Project", calc={
+        "剩餘預算": "{預算}-{實際支出}",
+        "預算使用率": "IF({預算}=0,0,{實際支出}/{預算})",
+    })
+    # 條件式格式套用到第 200 列：表格新增列時也有警示；逾期規則先確認截止日不是空白
+    cf_last = VALIDATION_ROWS
     set_widths(ws, [10, 16, 9, 12, 9, 10, 11, 11, 11, 11])
     ws.freeze_panes = "C2"
 
@@ -439,15 +491,15 @@ def build_07():
     wb.defined_names.add(DefinedName("基準日", attr_text="'設定'!$B$1"))
 
     cf = ws.conditional_formatting
-    cf.add(f"I2:I{last}", CellIsRule(operator="lessThan", formula=["0"],
-                                     font=Font(color="9C0006", bold=True),
-                                     fill=PatternFill("solid", fgColor="FFC7CE")))
-    cf.add(f"A2:J{last}", FormulaRule(formula=['AND($D2<基準日,$E2<>"已完成")'],
-                                      fill=PatternFill("solid", fgColor="FFEB9C")))
-    cf.add(f"E2:E{last}", FormulaRule(formula=['$E2="已完成"'], font=Font(color="006100"),
-                                      fill=PatternFill("solid", fgColor="C6EFCE")))
-    cf.add(f"F2:F{last}", DataBarRule(start_type="num", start_value=0, end_type="num",
-                                      end_value=1, color="5B9BD5"))
+    cf.add(f"I2:I{cf_last}", CellIsRule(operator="lessThan", formula=["0"],
+                                        font=Font(color="9C0006", bold=True),
+                                        fill=PatternFill("solid", fgColor="FFC7CE")))
+    cf.add(f"A2:J{cf_last}", FormulaRule(formula=['AND($D2<>"",$D2<基準日,$E2<>"已完成")'],
+                                         fill=PatternFill("solid", fgColor="FFEB9C")))
+    cf.add(f"E2:E{cf_last}", FormulaRule(formula=['$E2="已完成"'], font=Font(color="006100"),
+                                         fill=PatternFill("solid", fgColor="C6EFCE")))
+    cf.add(f"F2:F{cf_last}", DataBarRule(start_type="num", start_value=0, end_type="num",
+                                         end_value=1, color="5B9BD5"))
 
     wb.save(lesson_path("07_條件式格式", "專案進度管控表.xlsx"))
 
@@ -494,23 +546,24 @@ def build_08():
     write_header(orders, 1, ["訂單編號", "訂單日期", "產品編號", "數量",
                              "產品名稱", "類別", "單價", "小計"])
 
-    def lookup(r, col, missing):
+    def lookup(col, missing):
         # XLOOKUP 是 Excel 2021／365 的新函數，檔案內必須寫成 _xlfn.XLOOKUP
-        return f"=_xlfn.XLOOKUP(C{r},T_Product[產品編號],T_Product[{col}],{missing})"
+        return f"_xlfn.XLOOKUP({{產品編號}},T_Product[產品編號],T_Product[{col}],{missing})"
 
-    rows = []
-    for i, order in enumerate(ORDERS):
-        r = 2 + i
-        rows.append(order + (lookup(r, "產品名稱", f'"{NOT_FOUND}"'), lookup(r, "類別", '"—"'),
-                             lookup(r, "單價", "0"), f"=D{r}*G{r}"))
+    rows = [order + (None,) * 4 for order in ORDERS]
     write_rows(orders, 2, rows, {2: DATE, 4: AMOUNT, 7: AMOUNT, 8: AMOUNT})
     last = 1 + len(rows)
-    add_table(orders, f"A1:H{last}", "T_Order")
+    add_table(orders, f"A1:H{last}", "T_Order", calc={
+        "產品名稱": lookup("產品名稱", f'"{NOT_FOUND}"'),
+        "類別": lookup("類別", '"—"'),
+        "單價": lookup("單價", "0"),
+        "小計": "{數量}*{單價}",
+    })
     set_widths(orders, [10, 12, 10, 7, 14, 10, 9, 10])
     orders.freeze_panes = "A2"
     orders.conditional_formatting.add(
-        f"A2:H{last}", FormulaRule(formula=[f'$E2="{NOT_FOUND}"'], font=Font(color="9C0006"),
-                                   fill=PatternFill("solid", fgColor="FFC7CE")))
+        f"A2:H{VALIDATION_ROWS}", FormulaRule(formula=[f'$E2="{NOT_FOUND}"'], font=Font(color="9C0006"),
+                                              fill=PatternFill("solid", fgColor="FFC7CE")))
 
     write_header(summary, 1, ["彙總項目", "數值", "公式說明"])
     items = [
@@ -648,9 +701,9 @@ def build_10():
 
     clean = wb.create_sheet("清洗後")
     write_header(clean, 1, ["原始編號", "申請日期", "部門", "申請人", "品項", "數量", "單位", "單價", "小計"])
-    rows = [row + (f"=F{2 + i}*H{2 + i}",) for i, row in enumerate(CLEANED)]
+    rows = [row + (None,) for row in CLEANED]
     write_rows(clean, 2, rows, {2: DATE, 6: AMOUNT, 8: AMOUNT, 9: AMOUNT})
-    add_table(clean, f"A1:I{1 + len(rows)}", "T_Purchase")
+    add_table(clean, f"A1:I{1 + len(rows)}", "T_Purchase", calc={"小計": "{數量}*{單價}"})
     set_widths(clean, [10, 12, 9, 9, 18, 7, 7, 9, 10])
     clean.freeze_panes = "A2"
 
@@ -691,25 +744,29 @@ def build_11():
     ws = wb.active
     ws.title = "月營收"
     write_header(ws, 1, ["月份", "門市營收", "線上營收", "合計營收"])
-    rows = [(date(2025, m, 1), store, online, f"=B{m + 1}+C{m + 1}")
+    rows = [(date(2025, m, 1), store, online, None)
             for m, (store, online) in enumerate(MONTHLY_REVENUE, start=1)]
     write_rows(ws, 2, rows, {1: "yyyy-mm", 2: AMOUNT, 3: AMOUNT, 4: AMOUNT})
+    add_table(ws, f"A1:D{1 + len(rows)}", "T_Revenue", calc={"合計營收": "{門市營收}+{線上營收}"})
     set_widths(ws, [10, 12, 12, 12])
     ws.freeze_panes = "A2"
 
+    # 季彙總用「起始月份」配 SUMIFS，月營收表格新增月份也不用改公式
     q = wb.create_sheet("季彙總")
-    write_header(q, 1, ["季別", "門市營收", "線上營收", "合計營收"])
+    write_header(q, 1, ["季別", "起始月份", "門市營收", "線上營收", "合計營收"])
     for i in range(4):
-        r, a, b = 2 + i, 2 + i * 3, 4 + i * 3
+        r = 2 + i
         q.cell(row=r, column=1, value=f"Q{i + 1}").font = Font(name=FONT_NAME, bold=True)
-        for c, col in ((2, "B"), (3, "C")):
-            q.cell(row=r, column=c, value=f"=SUM('月營收'!{col}{a}:{col}{b})").number_format = AMOUNT
-        q.cell(row=r, column=4, value=f"=B{r}+C{r}").number_format = AMOUNT
+        q.cell(row=r, column=2, value=date(2025, 1 + i * 3, 1)).number_format = "yyyy-mm"
+        cond = f'T_Revenue[月份],">="&$B{r},T_Revenue[月份],"<"&EDATE($B{r},3)'
+        for c, field in ((3, "門市營收"), (4, "線上營收")):
+            q.cell(row=r, column=c, value=f"=SUMIFS(T_Revenue[{field}],{cond})").number_format = AMOUNT
+        q.cell(row=r, column=5, value=f"=C{r}+D{r}").number_format = AMOUNT
     write_header(q, 8, ["通路", "全年營收"])
-    for r, (name, col) in ((9, ("門市", "B")), (10, ("線上", "C"))):
+    for r, (name, field) in ((9, ("門市", "門市營收")), (10, ("線上", "線上營收"))):
         q.cell(row=r, column=1, value=name).font = Font(name=FONT_NAME, bold=True)
-        q.cell(row=r, column=2, value=f"=SUM({col}2:{col}5)").number_format = AMOUNT
-    set_widths(q, [10, 12, 12, 12])
+        q.cell(row=r, column=2, value=f"=SUM(T_Revenue[{field}])").number_format = AMOUNT
+    set_widths(q, [10, 11, 12, 12, 12])
 
     charts = wb.create_sheet("圖表")
     charts["A1"] = "三種問題，三種圖：趨勢 → 折線圖、比較 → 長條圖、組成 → 圓餅圖"
@@ -727,7 +784,7 @@ def build_11():
     bar = BarChart()
     bar.type = "col"
     bar.title = "各季門市與線上營收（比較）"
-    bar.add_data(Reference(q, min_col=2, max_col=3, min_row=1, max_row=5), titles_from_data=True)
+    bar.add_data(Reference(q, min_col=3, max_col=4, min_row=1, max_row=5), titles_from_data=True)
     bar.set_categories(Reference(q, min_col=1, min_row=2, max_row=5))
     _axes(bar, "季別", "營收（元）")
     charts.add_chart(bar, "A20")
@@ -770,9 +827,9 @@ def build_12():
 
     # 資料層
     write_header(data, 1, ["訂單編號", "訂單日期", "通路", "產品類別", "銷售金額", "成本", "毛利"])
-    rows = [r + (f"=E{2 + i}-F{2 + i}",) for i, r in enumerate(SALES_12)]
+    rows = [r + (None,) for r in SALES_12]
     write_rows(data, 2, rows, {2: DATE, 5: AMOUNT, 6: AMOUNT, 7: AMOUNT})
-    add_table(data, f"A1:G{1 + len(rows)}", "T_Sales12")
+    add_table(data, f"A1:G{1 + len(rows)}", "T_Sales12", calc={"毛利": "{銷售金額}-{成本}"})
     set_widths(data, [10, 12, 10, 10, 11, 10, 10])
     data.freeze_panes = "A2"
 

@@ -11,7 +11,7 @@
 | 新名詞 | 資料驗證（Data Validation）、下拉選單（清單）、提示訊息、錯誤訊息、選項清單（參照層） |
 | 情境 | 同仁請假登記 |
 | 📄 規範書 | [規範書_請假申請表.md](./規範書_請假申請表.md) |
-| 📗 觀察檔案 | [請假申請表.xlsx](./請假申請表.xlsx) |
+| 📗 觀察檔案 | ⬇️ [下載 請假申請表.xlsx](https://github.com/roberthsu2003/ai-excel-analytics/raw/main/01_%E7%94%A8AI%E7%94%9F%E6%88%90Excel/06_%E8%B3%87%E6%96%99%E9%A9%97%E8%AD%89/%E8%AB%8B%E5%81%87%E7%94%B3%E8%AB%8B%E8%A1%A8.xlsx)　｜　👀 [在 GitHub 預覽](./請假申請表.xlsx) |
 | 🎬 動畫 | [防呆與警示動畫](https://roberthsu2003.github.io/ai-excel-analytics/excel-generation/validation-format.html) |
 
 ---
@@ -40,6 +40,8 @@
 | **C7** | 示範資料全部合法，另外列出可以試著輸入的錯誤值 |
 
 ## 4️⃣ 打開 xlsx 觀察
+
+> ⬇️ **先下載檔案**：[請假申請表.xlsx](https://github.com/roberthsu2003/ai-excel-analytics/raw/main/01_%E7%94%A8AI%E7%94%9F%E6%88%90Excel/06_%E8%B3%87%E6%96%99%E9%A9%97%E8%AD%89/%E8%AB%8B%E5%81%87%E7%94%B3%E8%AB%8B%E8%A1%A8.xlsx)。下載後用 Excel 打開；在 GitHub 網頁上預覽看不到公式和格式。
 
 > 這一課要「點一下」才看得到效果，但**不用修改任何資料**。
 
