@@ -183,7 +183,7 @@
     /* 步驟 1：角色標籤卡片網格 */
     .role-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
       gap: 20px;
       margin-bottom: 32px;
     }
@@ -257,7 +257,7 @@
     }
     .quiz-items-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
       gap: 16px;
     }
     .quiz-card {
@@ -363,7 +363,7 @@
     }
     @media (max-width: 900px) {
       .block-detail-panel {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
       }
     }
 
@@ -575,7 +575,7 @@
     }
     @media (max-width: 800px) {
       .boundary-detail-box {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
       }
     }
     .b-card {
@@ -624,7 +624,7 @@
     }
     @media (max-width: 960px) {
       .sandbox-container {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
       }
     }
     .table-box {
@@ -713,7 +713,7 @@
     }
     @media (max-width: 900px) {
       .prompt-container {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
       }
     }
     .prompt-form {

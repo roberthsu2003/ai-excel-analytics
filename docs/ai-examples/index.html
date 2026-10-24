@@ -23,15 +23,6 @@
     body { font-family: 'Inter', 'Noto Sans TC', -apple-system, sans-serif; background: #F8FAFC; color: var(--slate-800); line-height: 1.6; padding-bottom: 80px; }
     a { color: inherit; }
 
-    header { background: rgba(255,255,255,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid var(--slate-200); position: sticky; top: 0; z-index: 100; }
-    .nav { max-width: 1200px; margin: 0 auto; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-    .crumb { display: flex; align-items: center; gap: 8px; }
-    .crumb .home { font-size: 0.82rem; font-weight: 700; color: var(--slate-500); text-decoration: none; padding: 4px 8px; border-radius: 6px; background: var(--slate-100); }
-    .crumb .here { font-weight: 800; font-size: 1.05rem; color: var(--slate-900); text-decoration: none; }
-    .nav-links { display: flex; gap: 6px; flex-wrap: wrap; }
-    .nav-links a { text-decoration: none; font-size: 0.85rem; font-weight: 700; padding: 6px 12px; border-radius: 6px; color: var(--slate-600); }
-    .nav-links a:hover { background: var(--slate-100); color: var(--slate-900); }
-
     .hero { max-width: 1000px; margin: 44px auto 28px; padding: 0 24px; text-align: center; }
     .hero-badge { display: inline-flex; gap: 6px; padding: 6px 16px; background: var(--primary-light); border: 1px solid var(--primary-border); border-radius: 999px; color: var(--primary); font-size: 0.88rem; font-weight: 700; margin-bottom: 16px; }
     .hero h1 { font-size: 2.5rem; font-weight: 900; color: var(--slate-900); letter-spacing: -0.03em; line-height: 1.25; margin-bottom: 14px; }
@@ -106,23 +97,9 @@
       .grid { grid-template-columns: 1fr; }
     }
   </style>
+  <script src="./js/nav.js"></script>
 </head>
 <body>
-  <header>
-    <div class="nav">
-      <div class="crumb">
-        <a class="home" href="../index.html">🏠 全課程總首頁</a>
-        <span style="color: var(--slate-300);">/</span>
-        <a class="here" href="./index.html">🤖 AI 協作資料分析</a>
-      </div>
-      <nav class="nav-links">
-        <a href="../chart-selection/index.html">📊 前一章：看懂資料與選對圖表</a>
-        <a href="https://github.com/roberthsu2003/ai-excel-analytics/blob/main/03_AI%E5%8D%94%E4%BD%9C%E8%B3%87%E6%96%99%E5%88%86%E6%9E%90/%E5%B8%B8%E8%A6%8B%E5%95%8F%E9%A1%8C%E6%8E%92%E8%A7%A3.md" target="_blank">🧯 常見問題排解 ↗</a>
-        <a href="https://github.com/roberthsu2003/ai-excel-analytics" target="_blank">GitHub ↗</a>
-      </nav>
-    </div>
-  </header>
-
   <section class="hero">
     <div class="hero-badge">🤖 不用寫程式，指揮 AI 做分析</div>
     <h1>循序實作範例</h1>
