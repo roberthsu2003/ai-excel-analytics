@@ -44,7 +44,7 @@
               ">${item.title}</a>
             `;
           }).join("")}
-          <a href="https://github.com/roberthsu2003/ai-excel-analytics/tree/main/用AI生成Excel" target="_blank" style="
+          <a href="https://github.com/roberthsu2003/ai-excel-analytics/tree/main/01_用AI生成Excel" target="_blank" style="
             text-decoration: none;
             font-size: 0.85rem;
             font-weight: 600;

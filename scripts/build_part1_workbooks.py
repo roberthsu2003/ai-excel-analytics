@@ -12,7 +12,7 @@ from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.table import Table, TableStyleInfo
 
-ROOT = Path(__file__).resolve().parent.parent / "用AI生成Excel"
+ROOT = Path(__file__).resolve().parent.parent / "01_用AI生成Excel"
 
 FONT_NAME = "Microsoft JhengHei"
 HEADER_FILL = PatternFill("solid", fgColor="1F4E79")

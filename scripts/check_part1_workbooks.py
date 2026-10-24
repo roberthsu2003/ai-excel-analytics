@@ -12,7 +12,7 @@ from pathlib import Path
 
 from openpyxl import load_workbook
 
-ROOT = Path(__file__).resolve().parent.parent / "用AI生成Excel"
+ROOT = Path(__file__).resolve().parent.parent / "01_用AI生成Excel"
 
 # 每課的期望值：sheet -> {"rows": (起, 迄), "date"/"number"/"text"/"formula": 欄, 各類數量}
 SPECS = {
