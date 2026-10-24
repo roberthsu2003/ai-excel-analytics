@@ -3,6 +3,7 @@
  */
 (function() {
   const navItems = [
+    { title: "⬅️ 上一章：用 AI 生成 Excel", url: "../excel-generation/index.html" },
     { title: "章節大廳", url: "./index.html" },
     { title: "💡 數據提問思考規則", url: "./question-rules.html" },
     { title: "🎯 五大問題與圖表動畫", url: "./question-types.html" },

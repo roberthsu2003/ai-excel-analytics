@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>公式與參照動畫 | 用 AI 生成 Excel</title>
+  <meta name="description" content="用動畫看懂公式向下填滿時，相對參照如何移動、絕對參照 $ 如何鎖住；再看 XLOOKUP 如何到主檔逐列查找。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/common.css">
+  <style>
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .step-caption {
+      min-height: 48px;
+      margin-top: 12px;
+      font-size: 0.93rem;
+      color: var(--slate-700);
+      background: var(--slate-50);
+      border: 1px dashed var(--slate-300);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+    }
+    .step-caption code { background: #fff; padding: 1px 6px; border-radius: 4px; border: 1px solid var(--slate-200); }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      font-size: 0.82rem;
+      color: var(--slate-600);
+      margin-top: 10px;
+    }
+    .legend i {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      margin-right: 4px;
+      vertical-align: -1px;
+    }
+    td.result { font-family: var(--mono); }
+    td.filled { animation: pop 0.45s ease; }
+    td.empty { color: transparent; }
+
+    .ref-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      margin-top: 8px;
+    }
+    .ref-table th, .ref-table td {
+      border: 1px solid var(--slate-200);
+      padding: 8px 10px;
+      text-align: left;
+    }
+    .ref-table th { background: var(--slate-100); }
+    .ref-table code { font-weight: 700; }
+    .ref-wrap { overflow-x: auto; }
+
+    .lookup-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+      gap: 18px;
+    }
+    @media (max-width: 860px) { .lookup-grid { grid-template-columns: minmax(0, 1fr); } }
+    .table-label {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--slate-700);
+      margin-bottom: 6px;
+    }
+    .formula-parts {
+      font-family: var(--mono);
+      font-size: 0.88rem;
+      background: var(--slate-900);
+      color: #e2e8f0;
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+    .formula-parts span { padding: 1px 3px; border-radius: 3px; transition: background 0.3s ease; }
+    .formula-parts .p1 { color: #93c5fd; }
+    .formula-parts .p2 { color: #c4b5fd; }
+    .formula-parts .p3 { color: #6ee7b7; }
+    .formula-parts .p4 { color: #fca5a5; }
+    .formula-parts span.on { background: rgba(255,255,255,0.18); }
+    tr.scan td { background: #fef9c3 !important; }
+    tr.match td { background: var(--primary-light) !important; box-shadow: inset 0 -2px 0 var(--primary); }
+    td.notfound { color: var(--danger) !important; font-weight: 800; background: var(--danger-light) !important; }
+    .sheet.compact { min-width: 300px; }
+  </style>
+  <script src="./js/nav.js"></script>
+</head>
+<body>
+
+  <section class="hero">
+    <div class="hero-badge">🔗 第 02、08 課・動畫版</div>
+    <h1>公式與參照動畫</h1>
+    <p>公式往下填滿時，哪些參照該跟著動、哪些該鎖住？XLOOKUP 怎麼去主檔找資料？按下播放，一步一步看。</p>
+  </section>
+
+  <main class="container">
+
+    <!-- 向下填滿 -->
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <h2 class="panel-title"><span>⬇️</span> 1. 向下填滿：相對參照 vs. 絕對參照</h2>
+          <p class="panel-sub">選一種公式，按「播放」。看公式從第 4 列一路複製到第 7 列時，彩色框框（被參照的格子）怎麼移動。</p>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="chip-row" id="modeChips" role="group" aria-label="公式種類">
+          <button class="chip active" data-mode="subtotal">D 小計：<code>=B4*C4</code></button>
+          <button class="chip" data-mode="absolute">E 稅額：<code>$B$1</code> ✅</button>
+          <button class="chip" data-mode="wrong">E 稅額：忘了加 <code>$</code> ❌</button>
+        </div>
+        <button class="play-btn" id="fillPlay">▶ 播放</button>
+      </div>
+
+      <div class="sheet-scroll">
+        <div class="excel-bar">
+          <div class="namebox" id="fillName">D4</div>
+          <div class="fx">fx</div>
+          <div class="formula" id="fillFormula"></div>
+        </div>
+        <table class="sheet" id="fillSheet" aria-label="向下填滿示範"></table>
+      </div>
+      <div class="legend">
+        <span><i style="background:var(--blue-light);box-shadow:inset 0 0 0 2px var(--blue)"></i>第一個參照</span>
+        <span><i style="background:var(--purple-light);box-shadow:inset 0 0 0 2px var(--purple)"></i>第二個參照</span>
+        <span><i style="box-shadow:inset 0 0 0 2px var(--excel)"></i>正在寫公式的格子</span>
+      </div>
+      <div class="step-caption" id="fillCaption" aria-live="polite"></div>
+
+      <div class="ref-wrap" style="margin-top: 22px;">
+        <table class="ref-table">
+          <tr><th>寫法</th><th>名稱</th><th>往下複製</th><th>往右複製</th><th>什麼時候用</th></tr>
+          <tr><td><code>B4</code></td><td>相對參照</td><td>變 B5</td><td>變 C4</td><td>每列各算各的（小計）</td></tr>
+          <tr><td><code>$B$1</code></td><td>絕對參照</td><td>不變</td><td>不變</td><td>固定的參數格（稅率、匯率）</td></tr>
+          <tr><td><code>$A9</code></td><td>混合參照（鎖欄）</td><td>變 $A10</td><td>不變</td><td>交叉表的列標題（第 09 課）</td></tr>
+          <tr><td><code>B$8</code></td><td>混合參照（鎖列）</td><td>不變</td><td>變 C$8</td><td>交叉表的欄標題（第 09 課）</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <!-- XLOOKUP -->
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <h2 class="panel-title"><span>🔎</span> 2. XLOOKUP：拿編號去主檔找資料</h2>
+          <p class="panel-sub">選一筆訂單，按「播放」。看 XLOOKUP 拿產品編號到主檔一列一列比對，找到後把產品名稱帶回來。</p>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="chip-row" id="orderChips" role="group" aria-label="選擇訂單">
+          <button class="chip active" data-i="0">O-0001（P-003）</button>
+          <button class="chip" data-i="1">O-0002（P-001）</button>
+          <button class="chip" data-i="2">O-0006（P-999 打錯）</button>
+        </div>
+        <button class="play-btn" id="lookPlay">▶ 播放</button>
+      </div>
+
+      <div class="formula-parts" id="lookFormula"></div>
+
+      <div class="lookup-grid">
+        <div>
+          <div class="table-label">📁 訂單明細（資料層）</div>
+          <div class="sheet-scroll">
+            <table class="sheet compact" id="orderSheet"></table>
+          </div>
+        </div>
+        <div>
+          <div class="table-label">📚 產品主檔（參照層）</div>
+          <div class="sheet-scroll">
+            <table class="sheet compact" id="masterSheet"></table>
+          </div>
+        </div>
+      </div>
+      <div class="step-caption" id="lookCaption" aria-live="polite"></div>
+      <p class="tip">💡 第 08 課的 <code>訂單與產品主檔.xlsx</code> 就是這個結構。O-0006 的 P-999 在檔案裡會整列標紅，彙總頁也會顯示「查無編號 1 筆」。</p>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>📖 文字版：<a href="https://github.com/roberthsu2003/ai-excel-analytics/tree/main/用AI生成Excel/02_公式與參照" target="_blank">02 公式與參照</a> ｜ <a href="https://github.com/roberthsu2003/ai-excel-analytics/tree/main/用AI生成Excel/08_主檔與跨表查詢" target="_blank">08 主檔與跨表查詢</a> ｜ 下一步：<a href="./spec-workflow.html">📐 規範書流程</a></p>
+  </footer>
+
+  <script>
+    const $ = id => document.getElementById(id);
+    const sleep = ms => new Promise(r => setTimeout(r, ms));
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const wait = ms => sleep(reduced ? 0 : ms);
+
+    // ---------- 1. 向下填滿 ----------
+    const items = [
+      { name: "原子筆", price: 20, qty: 10 },
+      { name: "便利貼", price: 45, qty: 30 },
+      { name: "釘書機", price: 180, qty: 5 },
+      { name: "計算機", price: 450, qty: 3 }
+    ];
+    const FIRST = 4; // 明細從第 4 列開始；第 1 列是稅率、第 3 列是表頭
+    // 每列 B 欄的內容，用來算「錯誤示範」時參照到哪一格
+    const colB = { 1: 0.05, 2: null, 3: "單價", 4: 20, 5: 45, 6: 180, 7: 450 };
+
+    const modes = {
+      subtotal: {
+        col: "D",
+        formula: r => `=B${r}*C${r}`,
+        refs: r => [`B${r}`, `C${r}`],
+        value: (r, it) => it.price * it.qty,
+        say: (r, it, v) => `第 ${r} 列：<code>=B${r}*C${r}</code>，B 和 C 都跟著往下移一列 → ${it.price} × ${it.qty} = <b>${v.toLocaleString()}</b>`,
+        end: "✅ 相對參照：每一列都自動改成「自己那一列」，這正是小計需要的。"
+      },
+      absolute: {
+        col: "E",
+        formula: r => `=ROUND(D${r}*$B$1,0)`,
+        refs: r => [`D${r}`, "B1"],
+        value: (r, it) => Math.round(it.price * it.qty * 0.05),
+        say: (r, it, v) => `第 ${r} 列：<code>D${r}</code> 往下移，<code>$B$1</code> 被 $ 鎖住不動 → ${(it.price * it.qty).toLocaleString()} × 5% = <b>${v}</b>`,
+        end: "✅ 絕對參照：稅率格永遠是 B1。改 B1 的稅率，整欄稅額一起更新。"
+      },
+      wrong: {
+        col: "E",
+        formula: r => `=ROUND(D${r}*B${r - 3},0)`,
+        refs: r => [`D${r}`, `B${r - 3}`],
+        value: (r, it) => {
+          const ref = colB[r - 3];
+          if (typeof ref === "string") return "#VALUE!";
+          return Math.round(it.price * it.qty * (ref || 0));
+        },
+        say: (r, it, v) => {
+          const ref = colB[r - 3];
+          const what = ref === null ? "空白格（當成 0）" : typeof ref === "string" ? `文字「${ref}」` : r - 3 === 1 ? "稅率 5%" : `單價 ${ref}`;
+          return `第 ${r} 列：沒有 $，B1 跟著往下變成 <code>B${r - 3}</code>，乘到了${what} → <b class="bad">${typeof v === "number" ? v.toLocaleString() : v}</b>`;
+        },
+        end: "❌ 只有第一列是對的！稅率格跑掉了：先變 0、再變 #VALUE!、最後變成離譜的 27,000。審規範書時看到 C3 參照固定格子卻沒有 $，就要請 AI 修正。"
+      }
+    };
+    let mode = "subtotal";
+    let fillRun = 0;
+
+    function renderFillSheet() {
+      const cols = ["A", "B", "C", "D", "E"];
+      const rowsHtml = [];
+      rowsHtml.push(`<tr><th class="rowhead"></th>${cols.map(c => `<th>${c}</th>`).join("")}</tr>`);
+      rowsHtml.push(`<tr><th class="rowhead">1</th><td data-a="A1" style="font-weight:700;background:#ddebf7">營業稅率</td><td data-a="B1" class="num">5%</td><td></td><td></td><td></td></tr>`);
+      rowsHtml.push(`<tr><th class="rowhead">2</th><td data-a="A2"></td><td data-a="B2"></td><td></td><td></td><td></td></tr>`);
+      rowsHtml.push(`<tr class="header"><th class="rowhead">3</th><td>品名</td><td data-a="B3">單價</td><td>數量</td><td>小計</td><td>稅額</td></tr>`);
+      items.forEach((it, i) => {
+        const r = FIRST + i;
+        rowsHtml.push(`<tr><th class="rowhead">${r}</th><td>${it.name}</td><td data-a="B${r}" class="num">${it.price}</td><td data-a="C${r}" class="num">${it.qty}</td><td data-a="D${r}" class="num result">${(it.price * it.qty).toLocaleString()}</td><td data-a="E${r}" class="num result empty">—</td></tr>`);
+      });
+      $("fillSheet").innerHTML = rowsHtml.join("");
+    }
+
+    function cell(a) { return document.querySelector(`#fillSheet [data-a="${a}"]`); }
+    function clearRefs(root) {
+      root.querySelectorAll(".ref-a, .ref-b, .cell-active").forEach(el => el.classList.remove("ref-a", "ref-b", "cell-active"));
+    }
+
+    async function playFill() {
+      const run = ++fillRun;
+      const m = modes[mode];
+      renderFillSheet();
+      // 小計模式時先清空 D 欄，讓它一格一格長出來
+      items.forEach((_, i) => {
+        const target = cell(`${m.col}${FIRST + i}`);
+        target.textContent = "—";
+        target.classList.add("empty");
+      });
+      for (let i = 0; i < items.length; i++) {
+        if (run !== fillRun) return;
+        const r = FIRST + i;
+        const it = items[i];
+        clearRefs($("fillSheet"));
+        const target = cell(`${m.col}${r}`);
+        target.classList.add("cell-active");
+        $("fillName").textContent = `${m.col}${r}`;
+        $("fillFormula").textContent = m.formula(r);
+        const [a, b] = m.refs(r);
+        cell(a)?.classList.add("ref-a");
+        cell(b)?.classList.add("ref-b");
+        const v = m.value(r, it);
+        $("fillCaption").innerHTML = m.say(r, it, v);
+        await wait(700);
+        if (run !== fillRun) return;
+        target.textContent = typeof v === "number" ? v.toLocaleString() : v;
+        target.classList.remove("empty");
+        target.classList.toggle("bad", typeof v !== "number" || (mode === "wrong" && i > 0));
+        target.classList.remove("filled");
+        void target.offsetWidth;
+        target.classList.add("filled");
+        await wait(1100);
+      }
+      if (run !== fillRun) return;
+      clearRefs($("fillSheet"));
+      $("fillCaption").innerHTML = m.end;
+    }
+
+    $("modeChips").addEventListener("click", e => {
+      const btn = e.target.closest(".chip");
+      if (!btn) return;
+      mode = btn.dataset.mode;
+      document.querySelectorAll("#modeChips .chip").forEach(b => b.classList.toggle("active", b === btn));
+      playFill();
+    });
+    $("fillPlay").addEventListener("click", playFill);
+
+    // ---------- 2. XLOOKUP ----------
+    const products = [
+      ["P-001", "無線滑鼠", 590],
+      ["P-002", "機械鍵盤", 2490],
+      ["P-003", "27 吋螢幕", 6990],
+      ["P-004", "USB-C 集線器", 890],
+      ["P-005", "筆電支架", 1290]
+    ];
+    const orders = [
+      ["O-0001", "P-003", 2],
+      ["O-0002", "P-001", 10],
+      ["O-0006", "P-999", 2]
+    ];
+    let orderIdx = 0;
+    let lookRun = 0;
+
+    function renderLookup() {
+      $("orderSheet").innerHTML =
+        `<tr class="header"><td>訂單編號</td><td>產品編號</td><td>數量</td><td>產品名稱</td></tr>` +
+        orders.map((o, i) => `<tr data-o="${i}"><td>${o[0]}</td><td class="pcode">${o[1]}</td><td class="num">${o[2]}</td><td class="pname">—</td></tr>`).join("");
+      $("masterSheet").innerHTML =
+        `<tr class="header"><td>產品編號</td><td>產品名稱</td><td>單價</td></tr>` +
+        products.map((p, i) => `<tr data-p="${i}"><td class="mcode">${p[0]}</td><td class="mname">${p[1]}</td><td class="num">${p[2].toLocaleString()}</td></tr>`).join("");
+      const row = 2 + orderIdx;
+      $("lookFormula").innerHTML = `=XLOOKUP( <span class="p1">B${row}</span> , <span class="p2">T_Product[產品編號]</span> , ` +
+        `<span class="p3">T_Product[產品名稱]</span> , <span class="p4">"查無此編號"</span> )`;
+    }
+
+    function partOn(cls) {
+      document.querySelectorAll(".formula-parts span").forEach(s => s.classList.toggle("on", s.classList.contains(cls)));
+    }
+
+    async function playLookup() {
+      const run = ++lookRun;
+      renderLookup();
+      const order = orders[orderIdx];
+      const orderRow = document.querySelector(`#orderSheet tr[data-o="${orderIdx}"]`);
+      const code = orderRow.querySelector(".pcode");
+      const target = orderRow.querySelector(".pname");
+
+      partOn("p1");
+      code.classList.add("ref-a");
+      target.classList.add("cell-active");
+      $("lookCaption").innerHTML = `① 要找什麼：這筆訂單的產品編號 <code>${order[1]}</code>`;
+      await wait(1200);
+      if (run !== lookRun) return;
+
+      partOn("p2");
+      document.querySelectorAll("#masterSheet .mcode").forEach(td => td.classList.add("ref-b"));
+      $("lookCaption").innerHTML = "② 去哪裡找：產品主檔的「產品編號」欄，從上往下一列一列比對";
+      await wait(1100);
+
+      let found = -1;
+      const masterRows = document.querySelectorAll("#masterSheet tr[data-p]");
+      for (let i = 0; i < masterRows.length; i++) {
+        if (run !== lookRun) return;
+        masterRows.forEach(r => r.classList.remove("scan"));
+        masterRows[i].classList.add("scan");
+        const same = products[i][0] === order[1];
+        $("lookCaption").innerHTML = `比對第 ${i + 1} 筆：<code>${products[i][0]}</code> ${same ? "＝" : "≠"} <code>${order[1]}</code>${same ? " 👉 找到了！" : ""}`;
+        await wait(650);
+        if (same) { found = i; break; }
+      }
+      if (run !== lookRun) return;
+      masterRows.forEach(r => r.classList.remove("scan"));
+      document.querySelectorAll("#masterSheet .mcode").forEach(td => td.classList.remove("ref-b"));
+
+      if (found >= 0) {
+        partOn("p3");
+        masterRows[found].classList.add("match");
+        masterRows[found].querySelector(".mname").classList.add("ref-c");
+        $("lookCaption").innerHTML = `③ 找到後回傳什麼：同一列的「產品名稱」<b>${products[found][1]}</b>`;
+        await wait(1000);
+        if (run !== lookRun) return;
+        target.textContent = products[found][1];
+        target.classList.add("filled");
+        $("lookCaption").innerHTML = `✅ 訂單的產品名稱自動填入「${products[found][1]}」。主檔改名稱，這裡也會跟著變。`;
+      } else {
+        partOn("p4");
+        $("lookCaption").innerHTML = `④ 找不到時顯示什麼：主檔沒有 <code>${order[1]}</code>，回傳第 4 個引數`;
+        await wait(1000);
+        if (run !== lookRun) return;
+        target.textContent = "查無此編號";
+        target.classList.add("notfound", "filled");
+        $("lookCaption").innerHTML = "⚠️ 顯示「查無此編號」，錯誤看得見，才知道要回頭檢查訂單。如果用 IFERROR 全部變成 0，錯誤就被藏起來了。";
+      }
+    }
+
+    $("orderChips").addEventListener("click", e => {
+      const btn = e.target.closest(".chip");
+      if (!btn) return;
+      orderIdx = Number(btn.dataset.i);
+      document.querySelectorAll("#orderChips .chip").forEach(b => b.classList.toggle("active", b === btn));
+      playLookup();
+    });
+    $("lookPlay").addEventListener("click", playLookup);
+
+    renderFillSheet();
+    renderLookup();
+    playFill();
+    playLookup();
+  </script>
+</body>
+</html>

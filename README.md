@@ -4,7 +4,7 @@
 > **這份教材寫給「不會寫程式、但每天用 Excel」的你。**
 > 你不用先背公式，也不用先學 Python。整份教材只練兩件事：
 >
-> 1. **說清楚需求，讓 AI（Claude、ChatGPT、Gemini）直接產生 `.xlsx` 試算表**——不再手動建表。
+> 1. **說清楚需求，讓 AI 先寫規範書、你確認後再產生 `.xlsx` 試算表**——完全不手動建表。
 > 2. **看懂資料、問對問題，讓 AI 幫你分析與畫圖**——你負責想清楚與驗收，程式交給 AI。
 
 ---
@@ -18,48 +18,49 @@ flowchart LR
 
 | 部 | 主題 | 你會帶走的能力 | 從這裡開始 |
 | :---: | :--- | :--- | :--- |
-| **一** | **用 AI 生成 Excel 試算表** | 開出「規格書」讓 AI 一次產出：無合併儲存格、純數值、有公式、有防呆的活檔案 | 📗 [前導核心＋五大階梯](#第一部用-ai-生成-excel-試算表) |
+| **一** | **用 AI 生成 Excel 試算表** | 看懂 Excel 名詞與 RTCCF 規範書，審核後讓 AI 產出無合併、型態正確、有公式、有防呆的活檔案 | 📗 [基本觀念＋12 課](#第一部用-ai-生成-excel-試算表) |
 | **二** | **看懂資料與選對圖表** | 拿到陌生表格，說出「能回答什麼、該用什麼圖、哪些結論不能下」 | 📊 [7 堂課由淺至深](#第二部看懂資料與選對圖表) |
 | **三** | **AI 協作資料分析** | 在 Colab 指揮 AI 讀檔、清理、計算、畫圖，並親自驗收結果 | 🤖 [循序實作範例](#第三部ai-協作資料分析循序實作範例) |
 
 > 💡 **為什麼先學「生成 Excel」？** 分析的品質取決於資料的品質。第一部學會的「一列一筆、不合併、純數值」，正是第二、三部 AI 能不能讀懂你資料的前提。
 
-🌐 **互動網站**：[學習首頁](https://roberthsu2003.github.io/ai-excel-analytics/)｜[選圖互動實驗室](https://roberthsu2003.github.io/ai-excel-analytics/chart-selection/)｜[實作範例卡片頁](https://roberthsu2003.github.io/ai-excel-analytics/ai-examples/)
+🌐 **互動網站**：[學習首頁](https://roberthsu2003.github.io/ai-excel-analytics/)｜[用 AI 生成 Excel 互動專區](https://roberthsu2003.github.io/ai-excel-analytics/excel-generation/)｜[選圖互動實驗室](https://roberthsu2003.github.io/ai-excel-analytics/chart-selection/)｜[實作範例卡片頁](https://roberthsu2003.github.io/ai-excel-analytics/ai-examples/)
 
 ---
 
 ## 第一部｜用 AI 生成 Excel 試算表
 
-> **核心觀念**：不是叫 AI「幫我做一張銷售表」，而是像架構師一樣開出規格，讓 AI 產出能排序、能篩選、能樞紐分析的**活檔案**。
+> **核心觀念**：這一部**完全不用手動做表**。你負責懂名詞、審規範書、打開觀察；動手做 Excel 交給 AI。任何能產生檔案的 AI 助理都適用。
 
-📘 **完整教材**：[Excel (.xlsx) 試算表生成模組：五階漸進實戰指南](https://github.com/roberthsu2003/workflow-productivity/blob/main/%E5%B8%B8%E8%A6%8B%E7%9A%84AI%E6%87%89%E7%94%A8/%E8%BE%A6%E5%85%AC%E5%AE%A4%E5%85%A8%E8%83%BD%E6%87%89%E7%94%A8/Excel%E8%A9%A6%E7%AE%97%E8%A1%A8%E7%9A%84%E7%94%9F%E6%88%90/README.md)（位於 workflow-productivity 專案）
+📂 **完整教材**：[用AI生成Excel](./用AI生成Excel/README.md)　🎬 **互動網站**：[第一部互動專區](https://roberthsu2003.github.io/ai-excel-analytics/excel-generation/)（名詞圖鑑、公式參照動畫、規範書流程、防呆與警示）
 
-### 人機協作四步閉環
+### 人機協作四步流程
 
 | 步驟 | 你做什麼 | AI 做什麼 |
 | :---: | :--- | :--- |
-| ① | 用白話說出需求、上傳原始資料 | — |
-| ② | — | 轉成 RTCCF 規格書（`.md`），鎖定分頁、欄位、公式、防呆 |
-| ③ | 看「數據與邏輯審核卡片」，檢查公式、格式、數值 | 列出審核卡片供你預檢 |
-| ④ | 回覆「審核通過」 | 正式產生並匯出 `.xlsx` 檔 |
+| ① | 用白話說出需求 | — |
+| ② | — | 依 [RTCCF 規範書標準](./用AI生成Excel/00_RTCCF規範書標準/README.md) 寫出「試算表規範書 .md」，**先不做 Excel** |
+| ③ | 用[檢查清單](./用AI生成Excel/00_RTCCF規範書標準/規範書檢查清單.md)逐項打勾，全部通過才回覆「確認」 | 依你的意見修改 |
+| ④ | 打開 `.xlsx`，對照規範書觀察驗收 | 完全照規範書產生 `.xlsx`，附驗收清單 |
 
-### 前導心法＋五大階梯
+👉 每一步要貼給 AI 的話：[通用提示詞](./用AI生成Excel/通用提示詞.md)
 
-| 階梯 | 主題 | 告別的痛苦 | 交付成果 |
-| :---: | :--- | :--- | :--- |
-| 🧠 | [前導核心：AI 時代的 Excel 資料架構與審核心法](https://github.com/roberthsu2003/workflow-productivity/blob/main/%E5%B8%B8%E8%A6%8B%E7%9A%84AI%E6%87%89%E7%94%A8/%E8%BE%A6%E5%85%AC%E5%AE%A4%E5%85%A8%E8%83%BD%E6%87%89%E7%94%A8/Excel%E8%A9%A6%E7%AE%97%E8%A1%A8%E7%9A%84%E7%94%9F%E6%88%90/00_%E5%89%8D%E5%B0%8E%E6%A0%B8%E5%BF%83_AI%E6%99%82%E4%BB%A3%E7%9A%84Excel%E8%B3%87%E6%96%99%E6%9E%B6%E6%A7%8B%E8%88%87%E5%AF%A9%E6%A0%B8%E5%BF%83%E6%B3%95/README.md) | 盲目下指令產出合併儲存格、死數字的廢表 | 規格書 Prompt 四維度範本 |
-| 🟢 1 | [基礎建表與運算](https://github.com/roberthsu2003/workflow-productivity/blob/main/%E5%B8%B8%E8%A6%8B%E7%9A%84AI%E6%87%89%E7%94%A8/%E8%BE%A6%E5%85%AC%E5%AE%A4%E5%85%A8%E8%83%BD%E6%87%89%E7%94%A8/Excel%E8%A9%A6%E7%AE%97%E8%A1%A8%E7%9A%84%E7%94%9F%E6%88%90/01_%E9%9A%8E%E6%A2%AF%E4%B8%80_%E5%9F%BA%E7%A4%8E%E5%BB%BA%E8%A1%A8%E8%88%87%E9%81%8B%E7%AE%97_%E5%91%8A%E5%88%A5%E6%8E%92%E7%89%88%E5%9C%B0%E9%9B%B7%E8%88%87%E5%85%AC%E5%BC%8F%E8%AA%9E%E6%B3%95/README.md) | 合併儲存格無法篩選、金額打「元」無法加總 | 部門差旅與專案費用報銷表 |
-| 🟡 2 | [資料防呆與自動警示](https://github.com/roberthsu2003/workflow-productivity/blob/main/%E5%B8%B8%E8%A6%8B%E7%9A%84AI%E6%87%89%E7%94%A8/%E8%BE%A6%E5%85%AC%E5%AE%A4%E5%85%A8%E8%83%BD%E6%87%89%E7%94%A8/Excel%E8%A9%A6%E7%AE%97%E8%A1%A8%E7%9A%84%E7%94%9F%E6%88%90/02_%E9%9A%8E%E6%A2%AF%E4%BA%8C_%E8%B3%87%E6%96%99%E9%98%B2%E5%91%86%E8%88%87%E8%87%AA%E5%8B%95%E8%AD%A6%E7%A4%BA_%E5%91%8A%E5%88%A5%E6%89%8B%E5%8B%95%E6%AA%A2%E6%9F%A5%E8%88%87%E7%9C%BC%E8%8A%B1%E6%8A%93%E6%BC%8F/README.md) | 狀態亂填、肉眼找超支 | 專案里程碑與預算進度管控表 |
-| 🟠 3 | [髒資料清洗與轉化](https://github.com/roberthsu2003/workflow-productivity/blob/main/%E5%B8%B8%E8%A6%8B%E7%9A%84AI%E6%87%89%E7%94%A8/%E8%BE%A6%E5%85%AC%E5%AE%A4%E5%85%A8%E8%83%BD%E6%87%89%E7%94%A8/Excel%E8%A9%A6%E7%AE%97%E8%A1%A8%E7%9A%84%E7%94%9F%E6%88%90/03_%E9%9A%8E%E6%A2%AF%E4%B8%89_%E9%AB%92%E8%B3%87%E6%96%99%E6%B8%85%E6%B4%97%E8%88%87%E8%BD%89%E5%8C%96_%E5%91%8A%E5%88%A5%E7%84%A1%E6%AD%A2%E5%A2%83%E8%A4%87%E8%A3%BD%E8%B2%BC%E4%B8%8A/README.md) | LINE 留言手動貼、民國年混雜、數字夾單位 | 各部門採購需求規範審核表 |
-| 🔵 4 | [跨表關聯與多維統計](https://github.com/roberthsu2003/workflow-productivity/blob/main/%E5%B8%B8%E8%A6%8B%E7%9A%84AI%E6%87%89%E7%94%A8/%E8%BE%A6%E5%85%AC%E5%AE%A4%E5%85%A8%E8%83%BD%E6%87%89%E7%94%A8/Excel%E8%A9%A6%E7%AE%97%E8%A1%A8%E7%9A%84%E7%94%9F%E6%88%90/04_%E9%9A%8E%E6%A2%AF%E5%9B%9B_%E8%B7%A8%E8%A1%A8%E9%97%9C%E8%81%AF%E8%88%87%E5%A4%9A%E7%B6%AD%E7%B5%B1%E8%A8%88_%E5%91%8A%E5%88%A5VLOOKUP%E7%A0%B4%E5%9C%96%E8%88%87%E5%85%AC%E5%BC%8F%E6%81%90%E6%87%BC/README.md) | VLOOKUP 破圖、`#N/A`、多條件統計記不住 | 多通路銷售毛利與跨表統計分析表 |
-| 🟣 5 | [商業儀表板與視覺化](https://github.com/roberthsu2003/workflow-productivity/blob/main/%E5%B8%B8%E8%A6%8B%E7%9A%84AI%E6%87%89%E7%94%A8/%E8%BE%A6%E5%85%AC%E5%AE%A4%E5%85%A8%E8%83%BD%E6%87%89%E7%94%A8/Excel%E8%A9%A6%E7%AE%97%E8%A1%A8%E7%9A%84%E7%94%9F%E6%88%90/05_%E9%9A%8E%E6%A2%AF%E4%BA%94_%E5%95%86%E6%A5%AD%E5%84%80%E8%A1%A8%E6%9D%BF%E8%88%87%E8%A6%96%E8%A6%BA%E5%8C%96_%E7%9B%B4%E4%B8%8A%E4%B8%BB%E7%AE%A1%E7%B4%9A%E5%95%86%E5%8B%99%E7%9C%8B%E6%9D%BF/README.md) | 圖表配色刺眼、說不出商業洞察 | 全通路營運績效與銷售分析儀表板 |
+### 課程地圖：每課一個新觀念＋一份規範書＋一個 xlsx
+
+| 階段 | 課 | 你會帶走的觀念 |
+| :--- | :--- | :--- |
+| 🧠 先備 | [00 Excel 基本觀念](./用AI生成Excel/00_Excel基本觀念/README.md)・[00 RTCCF 規範書標準](./用AI生成Excel/00_RTCCF規範書標準/README.md) | 認得欄、列、儲存格、資料型態、公式；看懂規範書每一節 |
+| 🟢 基礎建表 | [01 資料型態](./用AI生成Excel/01_儲存格與資料型態/README.md)・[02 公式與參照](./用AI生成Excel/02_公式與參照/README.md)・[03 常用函數](./用AI生成Excel/03_常用函數/README.md)・[04 結構化表格](./用AI生成Excel/04_一列一筆與結構化表格/README.md) | 值 vs. 格式、`$` 絕對參照、空白 ≠ 0、四不二要 |
+| 🟡 判斷與防呆 | [05 邏輯判斷](./用AI生成Excel/05_邏輯判斷/README.md)・[06 資料驗證](./用AI生成Excel/06_資料驗證/README.md)・[07 條件式格式](./用AI生成Excel/07_條件式格式/README.md) | IF／IFS、下拉選單、超支逾期自動變色 |
+| 🔵 跨表與整理 | [08 跨表查詢](./用AI生成Excel/08_主檔與跨表查詢/README.md)・[09 條件統計](./用AI生成Excel/09_條件統計彙總/README.md)・[10 資料清洗](./用AI生成Excel/10_髒資料清洗/README.md) | XLOOKUP、SUMIFS、把聊天訊息變成表格 |
+| 🟣 視覺化 | [11 圖表](./用AI生成Excel/11_圖表/README.md)・[12 主管儀表板](./用AI生成Excel/12_主管儀表板總整/README.md) | 依問題選圖、KPI 可追溯 |
 
 ### 防坑四大鐵律（也是後面分析的前提）
 
 1. **資料列不合併儲存格**：一列就是一筆紀錄，才能排序、篩選、樞紐分析。
-2. **純數值**：金額不打 `元`、`NT$`，單位交給儲存格格式 `#,##0`。
-3. **跨表查詢用 XLOOKUP**：不受欄號限制，增刪欄位不破圖。
-4. **公式優先**：小計、總計、毛利率一律用公式，不填算好的死值。
+2. **型態要對**：金額是數值（不打 `元`、`NT$`），日期是日期，要保留 0 的編號存成文字。
+3. **公式優先**：小計、總計、毛利率一律用公式，不填算好的死值。
+4. **資料和報表分開**：明細放資料層，總計、圖表放展示層。
 
 ---
 
@@ -107,6 +108,8 @@ flowchart LR
 | ⚪ **標識** | 每列都不一樣的編號 | 員工編號、訂單編號 | **只能數有幾筆**，不能加總或平均 |
 
 > ⚠️ 員工編號「10023」長得像數字，但它是**標識**，算它的平均沒有任何意義。
+>
+> 🔗 這三種角色在第一部規範書的 **C2 欄位定義表**已經出現過，第二部用它們來想問題。
 
 #### 第 2 課｜套提問積木：挑欄位，套句型
 

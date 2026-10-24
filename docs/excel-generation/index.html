@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>用 AI 生成 Excel | 章節大廳</title>
+  <meta name="description" content="第一部互動專區：完全不手動，讓 AI 先寫試算表規範書、你確認後再產生 xlsx。含 Excel 名詞圖鑑、公式參照動畫、規範書流程、防呆與警示，以及 12 課由淺至深的觀察教材。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/common.css">
+  <style>
+    .section-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--slate-900);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 8px 0 18px;
+    }
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 16px;
+    }
+    .step-item {
+      background: var(--slate-50);
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-md);
+      padding: 18px;
+    }
+    .step-num { font-size: 0.8rem; font-weight: 800; color: var(--primary); margin-bottom: 4px; }
+    .step-title { font-size: 1.05rem; font-weight: 800; color: var(--slate-900); margin-bottom: 4px; }
+    .step-desc { font-size: 0.88rem; color: var(--slate-600); }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+    .topic-card {
+      background: #fff;
+      border: 1.5px solid var(--slate-200);
+      border-radius: var(--radius-lg);
+      padding: 26px 22px;
+      box-shadow: var(--shadow-md);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    .topic-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: var(--card-accent, var(--primary));
+    }
+    .topic-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-xl); border-color: var(--card-accent, var(--primary)); }
+    .card-badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--card-light, var(--primary-light));
+      color: var(--card-accent, var(--primary));
+      margin-bottom: 12px;
+    }
+    .card-title { font-size: 1.22rem; font-weight: 800; color: var(--slate-900); margin-bottom: 8px; }
+    .card-desc { font-size: 0.92rem; color: var(--slate-600); }
+    .card-features { list-style: none; margin: 14px 0 18px; display: flex; flex-direction: column; gap: 6px; }
+    .card-features li { font-size: 0.86rem; color: var(--slate-700); font-weight: 600; }
+    .card-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: var(--card-accent, var(--primary));
+      color: #fff;
+      text-decoration: none;
+      padding: 11px 18px;
+      border-radius: var(--radius-md);
+      font-size: 0.93rem;
+      font-weight: 700;
+    }
+    .card-btn:hover { filter: brightness(1.08); }
+
+    .stage-block { margin-bottom: 26px; }
+    .stage-head {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+    .stage-head h3 { font-size: 1.08rem; font-weight: 800; color: var(--slate-900); }
+    .stage-head span { font-size: 0.86rem; color: var(--slate-500); }
+    .lesson-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 12px;
+    }
+    .lesson {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      background: #fff;
+      border: 1px solid var(--slate-200);
+      border-left: 4px solid var(--stage, var(--primary));
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      transition: all 0.2s ease;
+    }
+    .lesson:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+    .lesson .no { font-family: var(--mono); font-size: 0.78rem; font-weight: 700; color: var(--stage, var(--primary)); }
+    .lesson .name { font-weight: 800; color: var(--slate-900); margin: 2px 0; }
+    .lesson .what { font-size: 0.83rem; color: var(--slate-600); }
+    .lesson .files { font-size: 0.75rem; color: var(--slate-500); margin-top: 6px; }
+
+    .rules-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+    }
+    .rule-card {
+      background: #fff;
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-md);
+      padding: 16px;
+    }
+    .rule-card b { display: block; font-size: 1rem; color: var(--slate-900); margin-bottom: 4px; }
+    .rule-card p { font-size: 0.87rem; color: var(--slate-600); }
+  </style>
+  <script src="./js/nav.js"></script>
+</head>
+<body>
+
+  <section class="hero">
+    <div class="hero-badge">🟩 第一部・互動專區</div>
+    <h1>用 AI 生成 Excel：你審核，AI 動手</h1>
+    <p>這一部你完全不用動手做表。認得名詞 → 看懂 AI 寫的「試算表規範書」→ 確認後讓 AI 產生 xlsx → 打開觀察驗收。任何能產生檔案的 AI 助理都適用。</p>
+  </section>
+
+  <main class="container">
+
+    <section class="panel">
+      <h2 class="section-title"><span>🧭</span> 人機協作四步流程</h2>
+      <div class="steps-grid">
+        <div class="step-item"><div class="step-num">STEP 1・你</div><div class="step-title">🗣️ 白話需求</div><div class="step-desc">用自己的話說：做什麼用、誰填誰看、要算什麼。</div></div>
+        <div class="step-item"><div class="step-num">STEP 2・AI</div><div class="step-title">📄 寫規範書 .md</div><div class="step-desc">依 RTCCF 標準，五大段＋C1～C7，先不做 Excel。</div></div>
+        <div class="step-item"><div class="step-num">STEP 3・你</div><div class="step-title">✅ 檢查清單審核</div><div class="step-desc">日期是日期、金額是數值、算出來的都是公式，才回覆「確認」。</div></div>
+        <div class="step-item"><div class="step-num">STEP 4・AI＋你</div><div class="step-title">📗 產生並觀察 xlsx</div><div class="step-desc">AI 照規範書產生檔案；你打開，對照規範書觀察驗收。</div></div>
+      </div>
+    </section>
+
+    <h2 class="section-title"><span>🎬</span> 互動單元</h2>
+    <div class="cards-grid">
+      <div class="topic-card" style="--card-accent:#059669;--card-light:#ecfdf5;">
+        <div>
+          <span class="card-badge">第 00 課・基本觀念</span>
+          <h2 class="card-title">📘 Excel 名詞圖鑑</h2>
+          <p class="card-desc">完全不會 Excel 也沒關係。點名詞看它在畫面上的哪裡，認得之後才看得懂規範書。</p>
+          <ul class="card-features">
+            <li>🖥️ 欄、列、儲存格、範圍、資料編輯列</li>
+            <li>🔍 值 vs. 顯示格式翻牌卡</li>
+            <li>➕ 文字 vs. 數值加總對決</li>
+          </ul>
+        </div>
+        <a class="card-btn" href="./excel-terms.html"><span>開啟名詞圖鑑</span><span>→</span></a>
+      </div>
+      <div class="topic-card" style="--card-accent:#2563eb;--card-light:#eff6ff;">
+        <div>
+          <span class="card-badge">第 02、08 課・動畫</span>
+          <h2 class="card-title">🔗 公式與參照動畫</h2>
+          <p class="card-desc">公式往下填滿時，參照怎麼移動？忘了加 $ 會怎樣？XLOOKUP 怎麼去主檔找資料？</p>
+          <ul class="card-features">
+            <li>⬇️ 相對、絕對、錯誤示範三種填滿</li>
+            <li>🔎 XLOOKUP 逐列比對動畫</li>
+            <li>⚠️ 查無編號時錯誤看得見</li>
+          </ul>
+        </div>
+        <a class="card-btn" href="./formula-reference.html"><span>播放參照動畫</span><span>→</span></a>
+      </div>
+      <div class="topic-card" style="--card-accent:#7c3aed;--card-light:#f5f3ff;">
+        <div>
+          <span class="card-badge">RTCCF 規範書標準</span>
+          <h2 class="card-title">📐 規範書流程</h2>
+          <p class="card-desc">規範書每一節管 xlsx 的哪裡？點選章節，看它亮出對應的部分；再用互動檢查清單逐項打勾。</p>
+          <ul class="card-features">
+            <li>🧭 四步流程動畫</li>
+            <li>🔬 規範書解剖：12 節對照 xlsx</li>
+            <li>☑️ 互動檢查清單</li>
+          </ul>
+        </div>
+        <a class="card-btn" href="./spec-workflow.html"><span>看懂規範書</span><span>→</span></a>
+      </div>
+      <div class="topic-card" style="--card-accent:#d97706;--card-light:#fffbeb;">
+        <div>
+          <span class="card-badge">第 06、07 課・互動</span>
+          <h2 class="card-title">🛡️ 防呆與警示</h2>
+          <p class="card-desc">資料驗證在輸入當下擋錯；條件式格式在資料改變時自動變色。拖滑桿親手觸發警示。</p>
+          <ul class="card-features">
+            <li>▼ 下拉選單與錯誤訊息</li>
+            <li>🚦 超支、逾期、完成三色規則</li>
+            <li>📊 進度資料橫條</li>
+          </ul>
+        </div>
+        <a class="card-btn" href="./validation-format.html"><span>開啟沙盒</span><span>→</span></a>
+      </div>
+    </div>
+
+    <h2 class="section-title"><span>🗺️</span> 課程地圖：每課一個新觀念＋一份規範書＋一個 xlsx</h2>
+    <div id="lessonMap"></div>
+
+    <section class="panel" style="margin-top: 16px;">
+      <h2 class="section-title"><span>🔑</span> 貫穿全部的四條鐵律</h2>
+      <div class="rules-grid">
+        <div class="rule-card"><b>1. 資料列不合併</b><p>一列就是一筆，才能排序、篩選、樞紐分析。</p></div>
+        <div class="rule-card"><b>2. 型態要對</b><p>金額是數值（不打「元」），日期是日期，要保留 0 的編號存成文字。</p></div>
+        <div class="rule-card"><b>3. 公式優先</b><p>算出來的都用公式，不填死值。</p></div>
+        <div class="rule-card"><b>4. 資料和報表分開</b><p>明細放資料層，總計與圖表放展示層。</p></div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>📖 GitHub 完整教材：<a href="https://github.com/roberthsu2003/ai-excel-analytics/tree/main/用AI生成Excel" target="_blank">用AI生成Excel</a> ｜ 下一章：<a href="../chart-selection/index.html">📊 看懂資料與選對圖表</a></p>
+  </footer>
+
+  <script>
+    const BASE = "https://github.com/roberthsu2003/ai-excel-analytics/tree/main/用AI生成Excel/";
+    const stages = [
+      { title: "🧠 先備：看懂規範書的基礎", note: "不用打開 Excel", color: "#64748b", lessons: [
+        ["00", "Excel 基本觀念", "00_Excel基本觀念", "名詞、資料型態、公式、錯誤代碼", "文字教材"],
+        ["00", "RTCCF 規範書標準", "00_RTCCF規範書標準", "規範書每一節寫什麼、看什麼", "標準＋範本＋檢查清單"]
+      ]},
+      { title: "🟢 階段一：基礎建表", note: "第 01～04 課", color: "#059669", lessons: [
+        ["01", "儲存格與資料型態", "01_儲存格與資料型態", "值 vs. 顯示格式；文字、數值、日期", "社團收支紀錄.xlsx"],
+        ["02", "公式與參照", "02_公式與參照", "相對參照 vs. $ 絕對參照", "商品報價單.xlsx"],
+        ["03", "常用函數", "03_常用函數", "SUM、AVERAGE、COUNT；空白 ≠ 0", "班級成績表.xlsx"],
+        ["04", "一列一筆與結構化表格", "04_一列一筆與結構化表格", "四不二要；Excel Table", "部門費用報銷表.xlsx"]
+      ]},
+      { title: "🟡 階段二：判斷、防呆與警示", note: "第 05～07 課", color: "#d97706", lessons: [
+        ["05", "邏輯判斷", "05_邏輯判斷", "IF、IFS、AND；規則表", "業績獎金判定.xlsx"],
+        ["06", "資料驗證", "06_資料驗證", "下拉選單、範圍限制", "請假申請表.xlsx"],
+        ["07", "條件式格式", "07_條件式格式", "超支紅、逾期黃、完成綠", "專案進度管控表.xlsx"]
+      ]},
+      { title: "🔵 階段三：跨表與整理", note: "第 08～10 課", color: "#2563eb", lessons: [
+        ["08", "主檔與跨表查詢", "08_主檔與跨表查詢", "XLOOKUP、三層分工", "訂單與產品主檔.xlsx"],
+        ["09", "條件統計彙總", "09_條件統計彙總", "SUMIFS、COUNTIFS、交叉表", "多通路銷售彙總.xlsx"],
+        ["10", "髒資料清洗", "10_髒資料清洗", "LINE 訊息 → 乾淨表格", "採購需求清洗.xlsx"]
+      ]},
+      { title: "🟣 階段四：視覺化", note: "第 11～12 課", color: "#7c3aed", lessons: [
+        ["11", "圖表", "11_圖表", "依問題選折線、長條、圓餅", "月營收圖表.xlsx"],
+        ["12", "主管儀表板總整", "12_主管儀表板總整", "KPI 卡片＋圖表＋重點與限制", "全通路營運儀表板.xlsx"]
+      ]}
+    ];
+    document.getElementById("lessonMap").innerHTML = stages.map(s => `
+      <div class="stage-block" style="--stage:${s.color}">
+        <div class="stage-head"><h3>${s.title}</h3><span>${s.note}</span></div>
+        <div class="lesson-grid">
+          ${s.lessons.map(([no, name, folder, what, files]) => `
+            <a class="lesson" href="${BASE}${folder}" target="_blank" rel="noopener">
+              <div class="no">${no === "00" ? "先備" : "第 " + no + " 課"}</div>
+              <div class="name">${name}</div>
+              <div class="what">${what}</div>
+              <div class="files">📗 ${files}</div>
+            </a>`).join("")}
+        </div>
+      </div>`).join("");
+  </script>
+</body>
+</html>

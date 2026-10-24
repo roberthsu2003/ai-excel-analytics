@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>防呆與警示 | 用 AI 生成 Excel</title>
+  <meta name="description" content="看資料驗證如何在輸入當下擋下錯誤，條件式格式如何在資料改變時自動變色。拖動滑桿，親手觸發超支與逾期警示。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/common.css">
+  <style>
+    .compare {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+    .compare-card {
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      background: #fff;
+      box-shadow: var(--shadow-sm);
+    }
+    .compare-card h3 { font-size: 1.05rem; font-weight: 800; margin-bottom: 4px; }
+    .compare-card p { font-size: 0.88rem; color: var(--slate-600); }
+
+    .stage { position: relative; }
+    #dvSheet { min-width: 0; }
+    td.dv-cell { position: relative; min-width: 96px; }
+    .dv-arrow {
+      float: right;
+      color: var(--slate-500);
+      border-left: 1px solid var(--slate-300);
+      padding-left: 6px;
+      margin-left: 8px;
+    }
+    .dv-list {
+      position: absolute;
+      left: -1px;
+      top: 100%;
+      background: #fff;
+      border: 1px solid var(--slate-400);
+      box-shadow: var(--shadow-md);
+      z-index: 5;
+      min-width: calc(100% + 2px);
+      font-size: 0.85rem;
+      animation: fadeIn 0.2s ease;
+    }
+    .dv-list div { padding: 3px 10px; }
+    .dv-list div.pick { background: var(--blue); color: #fff; }
+    .prompt-bubble {
+      position: absolute;
+      right: 0;
+      top: calc(100% + 4px);
+      background: #fffbeb;
+      border: 1px solid #fcd34d;
+      padding: 6px 10px;
+      font-size: 0.8rem;
+      border-radius: 6px;
+      width: min(220px, 70vw);
+      z-index: 4;
+      white-space: normal;
+      color: var(--slate-700);
+      animation: fadeIn 0.25s ease;
+    }
+    .prompt-bubble b { display: block; color: var(--slate-900); }
+    .err-dialog {
+      margin-top: 16px;
+      max-width: 420px;
+      border: 1px solid var(--slate-300);
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-xl);
+      background: #fff;
+      animation: pop 0.35s ease;
+    }
+    .err-dialog .bar {
+      background: var(--slate-100);
+      padding: 6px 12px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      border-bottom: 1px solid var(--slate-200);
+    }
+    .err-dialog .body { display: flex; gap: 12px; padding: 14px; font-size: 0.9rem; align-items: center; }
+    .err-dialog .stop {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--danger);
+      color: #fff;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: none;
+    }
+    .err-dialog .btns { display: flex; gap: 8px; justify-content: flex-end; padding: 0 14px 12px; }
+    .err-dialog .btns span {
+      border: 1px solid var(--slate-300);
+      padding: 2px 14px;
+      font-size: 0.82rem;
+      border-radius: 4px;
+    }
+    .typing { font-family: var(--mono); }
+    .typing::after { content: "|"; animation: pulse 0.8s infinite; color: var(--slate-500); }
+
+    /* 條件式格式沙盒 */
+    .sliders {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .slider {
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      background: var(--slate-50);
+    }
+    .slider label { font-size: 0.88rem; font-weight: 700; display: flex; justify-content: space-between; gap: 8px; }
+    .slider output { font-family: var(--mono); color: var(--primary-dark); }
+    .slider input[type="range"] { width: 100%; margin-top: 8px; accent-color: var(--primary); }
+    .slider .toggle { display: flex; gap: 8px; align-items: center; font-size: 0.88rem; margin-top: 8px; }
+    .slider .toggle input { accent-color: var(--primary); width: 16px; height: 16px; }
+    tr.overdue td { background: #ffeb9c !important; }
+    td.neg { background: #ffc7ce !important; color: #9c0006 !important; font-weight: 800; }
+    td.donecell { background: #c6efce !important; color: #006100 !important; }
+    .bar-cell { position: relative; }
+    .bar-fill {
+      position: absolute;
+      left: 2px;
+      top: 6px;
+      bottom: 6px;
+      background: linear-gradient(90deg, #5b9bd5, #9dc3e6);
+      border-radius: 2px;
+      transition: width 0.4s ease;
+      z-index: 0;
+    }
+    .bar-cell span { position: relative; z-index: 1; }
+    .rules {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .rule {
+      border: 1.5px solid var(--slate-200);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      font-size: 0.85rem;
+      transition: all 0.3s ease;
+    }
+    .rule code { font-size: 0.78rem; display: block; margin-top: 4px; color: var(--slate-600); word-break: break-all; }
+    .rule .count { float: right; font-weight: 800; font-size: 0.8rem; padding: 0 8px; border-radius: 999px; background: var(--slate-100); color: var(--slate-500); }
+    .rule.firing { border-color: var(--warning); box-shadow: 0 0 0 3px #fde68a; }
+    .rule.firing .count { background: var(--warning); color: #fff; }
+  </style>
+  <script src="./js/nav.js"></script>
+</head>
+<body>
+
+  <section class="hero">
+    <div class="hero-badge">🛡️ 第 06、07 課・互動版</div>
+    <h1>防呆與警示</h1>
+    <p>資料驗證在「輸入當下」擋住錯誤；條件式格式在「資料改變時」自動變色。點按鈕、拖滑桿，看規範書 C4、C5 寫的規則怎麼動起來。</p>
+  </section>
+
+  <main class="container">
+
+    <div class="compare">
+      <div class="compare-card" style="border-top: 4px solid var(--blue);">
+        <h3>🛡️ 資料驗證（規範書 C4）</h3>
+        <p>時機：<b>輸入當下</b>。作用：擋住錯的值。例子：假別只能從選單挑、天數不能超過 14。</p>
+      </div>
+      <div class="compare-card" style="border-top: 4px solid var(--warning);">
+        <h3>🚦 條件式格式（規範書 C5）</h3>
+        <p>時機：<b>資料已經在表裡</b>。作用：把要注意的值標出來。例子：超支變紅、逾期變黃。</p>
+      </div>
+    </div>
+
+    <!-- 1. 資料驗證 -->
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <h2 class="panel-title"><span>🛡️</span> 1. 資料驗證：輸入的那一刻就擋下來</h2>
+          <p class="panel-sub">取自第 06 課《請假申請表》。選一個動作，看 Excel 怎麼回應。</p>
+        </div>
+      </div>
+      <div class="chip-row" id="dvChips" role="group" aria-label="資料驗證示範動作" style="margin-bottom: 14px;">
+        <button class="chip" data-act="prompt">👆 點到假別格子</button>
+        <button class="chip" data-act="open">▼ 打開下拉選單</button>
+        <button class="chip" data-act="badtype">⌨️ 輸入「颱風假」</button>
+        <button class="chip" data-act="baddays">⌨️ 天數輸入 20</button>
+        <button class="chip" data-act="good">✅ 選擇「特休」</button>
+      </div>
+      <div class="stage">
+        <div class="sheet-scroll" style="overflow: visible;">
+          <table class="sheet" id="dvSheet" aria-label="請假紀錄示範">
+            <tr><th class="rowhead"></th><th>A</th><th>B</th><th>C</th><th>D</th></tr>
+            <tr class="header"><th class="rowhead">1</th><td>員工姓名</td><td>部門</td><td>假別</td><td>請假天數</td></tr>
+            <tr><th class="rowhead">2</th><td>林志遠</td><td>研發部</td><td>特休</td><td class="num">2.0</td></tr>
+            <tr><th class="rowhead">3</th><td>張雅晴</td><td>行銷部</td><td>病假</td><td class="num">1.0</td></tr>
+            <tr><th class="rowhead">4</th><td>陳建宏</td><td>維運部</td><td class="dv-cell" id="leaveCell"></td><td class="num" id="daysCell"></td></tr>
+          </table>
+        </div>
+      </div>
+      <div id="dvOutput" aria-live="polite"></div>
+      <div class="info-box" id="dvInfo" style="margin-top: 16px;"></div>
+    </section>
+
+    <!-- 2. 條件式格式 -->
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <h2 class="panel-title"><span>🚦</span> 2. 條件式格式沙盒：資料一變，顏色就變</h2>
+          <p class="panel-sub">取自第 07 課《專案進度管控表》。拖動滑桿改資料，看哪些規則被觸發。</p>
+        </div>
+        <button class="replay-btn" id="cfReset">↺ 回到檔案原始值</button>
+      </div>
+      <div class="sliders">
+        <div class="slider">
+          <label for="spend">T-05 後端 API 實際支出 <output id="spendOut"></output></label>
+          <input type="range" id="spend" min="100000" max="220000" step="2000">
+          <div style="font-size:0.8rem;color:var(--slate-500);">預算 180,000</div>
+        </div>
+        <div class="slider">
+          <label for="base">基準日（今天） <output id="baseOut"></output></label>
+          <input type="range" id="base" min="0" max="121" step="1">
+          <div style="font-size:0.8rem;color:var(--slate-500);">2026-03-01 ～ 2026-06-30</div>
+        </div>
+        <div class="slider">
+          <label>T-03 UI 設計稿的狀態</label>
+          <div class="toggle"><input type="checkbox" id="t03done"><label for="t03done">標記為「已完成」</label></div>
+          <div style="font-size:0.8rem;color:var(--slate-500);margin-top:6px;">已完成的任務即使過了截止日也不算逾期</div>
+        </div>
+      </div>
+      <div class="sheet-scroll">
+        <table class="sheet" id="cfSheet" aria-label="專案進度示範"></table>
+      </div>
+      <div class="rules" id="rules"></div>
+      <p class="tip">💡 手動塗紅的格子，支出改回來也不會變色；條件式格式是「規則」，資料一變就重新判斷。所以規範書 C5 要寫成規則，而不是「把 T-02 那列塗紅」。</p>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>📖 文字版：<a href="https://github.com/roberthsu2003/ai-excel-analytics/tree/main/用AI生成Excel/06_資料驗證" target="_blank">06 資料驗證</a> ｜ <a href="https://github.com/roberthsu2003/ai-excel-analytics/tree/main/用AI生成Excel/07_條件式格式" target="_blank">07 條件式格式</a> ｜ 回到 <a href="./index.html">章節大廳</a></p>
+  </footer>
+
+  <script>
+    const $ = id => document.getElementById(id);
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const leaveTypes = ["特休", "事假", "病假", "公假", "婚假", "喪假"];
+
+    // ---------- 1. 資料驗證 ----------
+    let dvTimers = [];
+    function resetDv() {
+      dvTimers.forEach(clearTimeout);
+      dvTimers = [];
+      $("leaveCell").innerHTML = '<span class="dv-arrow">▼</span>';
+      $("leaveCell").classList.remove("cell-active");
+      $("daysCell").innerHTML = "";
+      $("daysCell").classList.remove("cell-active");
+      $("dvOutput").innerHTML = "";
+    }
+    function typeInto(el, text, done) {
+      el.innerHTML = '<span class="typing"></span>';
+      const span = el.querySelector(".typing");
+      const speed = reduced ? 0 : 160;
+      [...text].forEach((ch, i) => dvTimers.push(setTimeout(() => { span.textContent += ch; }, i * speed)));
+      dvTimers.push(setTimeout(done, text.length * speed + (reduced ? 0 : 300)));
+    }
+    function errorDialog(msg) {
+      return `<div class="err-dialog" role="alert">
+        <div class="bar">輸入錯誤</div>
+        <div class="body"><div class="stop">✕</div><div>${msg}</div></div>
+        <div class="btns"><span>重試</span><span>取消</span></div>
+      </div>`;
+    }
+
+    const actions = {
+      prompt: {
+        run: () => {
+          $("leaveCell").classList.add("cell-active");
+          $("leaveCell").insertAdjacentHTML("beforeend", '<div class="prompt-bubble"><b>填寫說明</b>請從下拉選單選擇假別</div>');
+        },
+        info: "<h3>提示訊息（Input Message）</h3><p>點到有驗證的格子，旁邊出現黃色提示框。規範書 C4 的「提示訊息」欄寫的就是這段文字。</p>"
+      },
+      open: {
+        run: () => {
+          $("leaveCell").classList.add("cell-active");
+          $("leaveCell").insertAdjacentHTML("beforeend", `<div class="dv-list">${leaveTypes.map(t => `<div>${t}</div>`).join("")}</div>`);
+        },
+        info: "<h3>下拉選單（清單驗證）</h3><p>選項來自「選項清單」工作表 B2:B7。要新增假別，只要改選項清單，不用改驗證規則。</p><span class='where'>📐 規範書 C4：清單 ='選項清單'!$B$2:$B$7</span>"
+      },
+      badtype: {
+        run: () => {
+          $("leaveCell").classList.add("cell-active");
+          typeInto($("leaveCell"), "颱風假", () => {
+            $("dvOutput").innerHTML = errorDialog("假別只能從選單中選擇");
+          });
+        },
+        info: "<h3>錯誤訊息（樣式：停止）</h3><p>選單裡沒有「颱風假」，Excel 直接擋下來，按「重試」才能重新輸入。如果規範書把樣式寫成「警告」或「資訊」，使用者按「是」就能硬塞進去，等於沒有防呆。</p><span class='where'>📐 規範書 C4：錯誤訊息＋樣式停止</span>"
+      },
+      baddays: {
+        run: () => {
+          $("daysCell").classList.add("cell-active");
+          typeInto($("daysCell"), "20", () => {
+            $("dvOutput").innerHTML = errorDialog("請假天數必須介於 0.5 ～ 14 天");
+          });
+        },
+        info: "<h3>數值範圍驗證</h3><p>天數限制在 0.5～14 之間，可以輸入小數（半天假 0.5）。20 超出範圍，被擋下來。</p><span class='where'>📐 規範書 C4：小數，介於 0.5 與 14</span>"
+      },
+      good: {
+        run: () => {
+          $("leaveCell").classList.add("cell-active");
+          $("leaveCell").insertAdjacentHTML("beforeend", `<div class="dv-list">${leaveTypes.map((t, i) => `<div class="${i === 0 ? "pick" : ""}">${t}</div>`).join("")}</div>`);
+          dvTimers.push(setTimeout(() => {
+            $("leaveCell").innerHTML = '特休<span class="dv-arrow">▼</span>';
+            $("leaveCell").classList.add("pop");
+            $("daysCell").textContent = "0.5";
+          }, reduced ? 0 : 900));
+        },
+        info: "<h3>從選單選擇：永遠拼對</h3><p>選單保證每個人寫的都是「特休」，不會出現「特別休假」「休假」。第二部要依假別分組統計時，才分得對。</p>"
+      }
+    };
+
+    $("dvChips").addEventListener("click", e => {
+      const btn = e.target.closest(".chip");
+      if (!btn) return;
+      document.querySelectorAll("#dvChips .chip").forEach(b => b.classList.toggle("active", b === btn));
+      resetDv();
+      const act = actions[btn.dataset.act];
+      act.run();
+      $("dvInfo").innerHTML = act.info;
+    });
+
+    // ---------- 2. 條件式格式 ----------
+    const ORIGINAL = { spend: 192000, base: 45, t03done: false }; // 基準日 2026-04-15 = 3/1 + 45 天
+    const tasks = [
+      { id: "T-02", name: "系統架構設計", due: new Date(2026, 2, 15), status: "已完成", progress: 1.0, budget: 80000, spend: 86000 },
+      { id: "T-03", name: "UI 設計稿", due: new Date(2026, 2, 31), status: "進行中", progress: 0.9, budget: 60000, spend: 45000 },
+      { id: "T-05", name: "後端 API 開發", due: new Date(2026, 4, 31), status: "進行中", progress: 0.7, budget: 180000, spend: 192000 },
+      { id: "T-06", name: "資料庫建置", due: new Date(2026, 3, 10), status: "進行中", progress: 0.8, budget: 70000, spend: 52000 },
+      { id: "T-08", name: "使用者測試", due: new Date(2026, 5, 15), status: "未開始", progress: 0.0, budget: 40000, spend: 0 }
+    ];
+    const fmtDate = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    const fmtNum = n => n.toLocaleString("en-US");
+
+    const ruleDefs = [
+      { key: "neg", title: "🔴 超支", formula: "剩餘預算 < 0", color: "#ffc7ce" },
+      { key: "overdue", title: "🟡 逾期（整列）", formula: '=AND($D2<基準日,$E2<>"已完成")', color: "#ffeb9c" },
+      { key: "done", title: "🟢 已完成", formula: '=$E2="已完成"', color: "#c6efce" },
+      { key: "bar", title: "📊 進度資料橫條", formula: "完成進度 0%～100%", color: "#9dc3e6" }
+    ];
+    $("rules").innerHTML = ruleDefs.map(r =>
+      `<div class="rule" data-rule="${r.key}"><span class="count">0</span><b>${r.title}</b><code>${r.formula}</code></div>`).join("");
+
+    function renderCf() {
+      const spend = Number($("spend").value);
+      const baseDate = new Date(2026, 2, 1 + Number($("base").value));
+      $("spendOut").textContent = fmtNum(spend);
+      $("baseOut").textContent = fmtDate(baseDate);
+      tasks[2].spend = spend;
+      tasks[1].status = $("t03done").checked ? "已完成" : "進行中";
+      tasks[1].progress = $("t03done").checked ? 1.0 : 0.9;
+
+      const counts = { neg: 0, overdue: 0, done: 0, bar: tasks.length };
+      let html = `<tr><th class="rowhead"></th>${["A","B","C","D","E","F","G"].map(c => `<th>${c}</th>`).join("")}</tr>`;
+      html += `<tr class="header"><th class="rowhead">1</th><td>任務</td><td>任務名稱</td><td>截止日</td><td>狀態</td><td>完成進度</td><td>預算</td><td>剩餘預算</td></tr>`;
+      tasks.forEach((t, i) => {
+        const left = t.budget - t.spend;
+        const overdue = t.due < baseDate && t.status !== "已完成";
+        const done = t.status === "已完成";
+        if (left < 0) counts.neg++;
+        if (overdue) counts.overdue++;
+        if (done) counts.done++;
+        html += `<tr class="${overdue ? "overdue" : ""}"><th class="rowhead">${i + 2}</th>
+          <td>${t.id}</td><td>${t.name}</td><td class="num">${fmtDate(t.due)}</td>
+          <td class="${done ? "donecell" : ""}">${t.status}</td>
+          <td class="num bar-cell"><div class="bar-fill" style="width:calc(${t.progress * 100}% - 4px)"></div><span>${Math.round(t.progress * 100)}%</span></td>
+          <td class="num">${fmtNum(t.budget)}</td>
+          <td class="num ${left < 0 ? "neg" : ""}">${fmtNum(left)}</td></tr>`;
+      });
+      $("cfSheet").innerHTML = html;
+      document.querySelectorAll(".rule").forEach(el => {
+        const n = counts[el.dataset.rule];
+        el.querySelector(".count").textContent = `${n} 格／列`;
+        el.classList.toggle("firing", n > 0 && el.dataset.rule !== "bar");
+      });
+    }
+
+    function resetCf() {
+      $("spend").value = ORIGINAL.spend;
+      $("base").value = ORIGINAL.base;
+      $("t03done").checked = ORIGINAL.t03done;
+      renderCf();
+    }
+    ["spend", "base", "t03done"].forEach(id => $(id).addEventListener("input", renderCf));
+    $("cfReset").addEventListener("click", resetCf);
+
+    resetDv();
+    $("dvInfo").innerHTML = "<h3>👆 從上方選一個動作</h3><p>這些是規範書 C4 寫的驗證規則在 Excel 裡的樣子。</p>";
+    resetCf();
+  </script>
+</body>
+</html>

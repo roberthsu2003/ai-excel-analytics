@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>規範書流程 | 用 AI 生成 Excel</title>
+  <meta name="description" content="用動畫看懂「白話需求 → AI 寫規範書 → 你審核 → AI 產生 xlsx」四步流程；點選 RTCCF 規範書每一節，看它控制 xlsx 的哪個部分。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/common.css">
+  <style>
+    /* 四步流程 */
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      position: relative;
+    }
+    @media (max-width: 860px) { .flow { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 480px) { .flow { grid-template-columns: minmax(0, 1fr); } }
+    .flow-step {
+      border: 2px solid var(--slate-200);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      background: #fff;
+      transition: all 0.35s ease;
+      opacity: 0.55;
+    }
+    .flow-step.on {
+      opacity: 1;
+      border-color: var(--primary);
+      box-shadow: 0 8px 20px -6px rgba(5, 150, 105, 0.35);
+      transform: translateY(-3px);
+    }
+    .flow-step.done { opacity: 1; border-color: var(--primary-border); }
+    .flow-step .who {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 999px;
+      margin-bottom: 8px;
+    }
+    .who.you { background: var(--blue-light); color: var(--blue); }
+    .who.ai { background: var(--purple-light); color: var(--purple); }
+    .flow-step .icon { font-size: 2rem; line-height: 1; margin-bottom: 6px; }
+    .flow-step h3 { font-size: 1rem; font-weight: 800; color: var(--slate-900); }
+    .flow-step p { font-size: 0.85rem; color: var(--slate-600); margin-top: 4px; }
+    .flow-step .artifact {
+      margin-top: 10px;
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      background: var(--slate-50);
+      border: 1px dashed var(--slate-300);
+      border-radius: 6px;
+      padding: 6px 8px;
+      color: var(--slate-700);
+      min-height: 56px;
+      white-space: pre-line;
+    }
+    .loop-note {
+      margin-top: 12px;
+      font-size: 0.88rem;
+      color: var(--warning);
+      font-weight: 700;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .loop-note.on { opacity: 1; }
+
+    /* 規範書解剖 */
+    .spec-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-family: var(--mono);
+      font-size: 0.88rem;
+    }
+    .spec-item {
+      text-align: left;
+      font: inherit;
+      background: #fff;
+      border: 1.5px solid var(--slate-200);
+      border-radius: var(--radius-sm);
+      padding: 7px 12px;
+      cursor: pointer;
+      color: var(--slate-800);
+      transition: all 0.2s ease;
+    }
+    .spec-item.sub { margin-left: 22px; }
+    .spec-item:hover { border-color: var(--primary); }
+    .spec-item.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .spec-item small { font-family: 'Noto Sans TC', sans-serif; opacity: 0.8; margin-left: 6px; }
+    .snippet {
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      background: var(--slate-900);
+      color: #e2e8f0;
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      white-space: pre;
+      overflow-x: auto;
+      margin-top: 10px;
+    }
+    .mock-file {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--slate-600);
+      margin-bottom: 8px;
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+    .type-row td {
+      font-size: 0.72rem;
+      color: var(--slate-500);
+      text-align: center;
+      background: var(--slate-50);
+      display: none;
+    }
+    .show-types .type-row td { display: table-cell; animation: fadeIn 0.3s ease; }
+    td.dd { position: relative; }
+    .dropdown {
+      position: absolute;
+      left: 0;
+      top: 100%;
+      z-index: 5;
+      background: #fff;
+      border: 1px solid var(--slate-300);
+      box-shadow: var(--shadow-md);
+      font-size: 0.8rem;
+      min-width: 100%;
+      display: none;
+      color: var(--slate-800);
+      font-weight: 400;
+    }
+    .dropdown div { padding: 3px 10px; }
+    .dropdown div:first-child { background: var(--blue-light); }
+    .show-dd .dropdown { display: block; animation: fadeIn 0.25s ease; }
+    .dd-arrow { display: none; float: right; color: var(--slate-500); margin-left: 6px; }
+    .show-dd .dd-arrow { display: inline; }
+    .show-cf td.over { background: #ffc7ce !important; color: #9c0006; font-weight: 700; }
+    .show-style tr.header td { background: var(--excel); }
+    .plain tr.header td { background: #94a3b8; }
+    .freeze-line tr.header td { border-bottom: 3px solid var(--slate-500); }
+
+    /* 檢查清單 */
+    .progress {
+      height: 10px;
+      background: var(--slate-100);
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 12px 0 16px;
+    }
+    .progress div {
+      height: 100%;
+      width: 0;
+      background: var(--primary);
+      transition: width 0.3s ease;
+    }
+    .check-groups {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+    }
+    .check-group {
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+    }
+    .check-group h4 { font-size: 0.92rem; margin-bottom: 6px; color: var(--slate-900); }
+    .check-group label {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      font-size: 0.87rem;
+      padding: 4px 0;
+      cursor: pointer;
+    }
+    .check-group input { margin-top: 4px; accent-color: var(--primary); width: 16px; height: 16px; flex: none; }
+    .confirm-box {
+      margin-top: 16px;
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      font-size: 0.93rem;
+      background: var(--slate-50);
+      border: 1px dashed var(--slate-300);
+      color: var(--slate-600);
+    }
+    .confirm-box.ready {
+      background: var(--primary-light);
+      border: 1.5px solid var(--primary);
+      color: var(--slate-800);
+      animation: pop 0.4s ease;
+    }
+    .confirm-box code { display: block; margin: 8px 0; background: #fff; padding: 8px 10px; border-radius: 6px; border: 1px solid var(--primary-border); white-space: normal; }
+  </style>
+  <script src="./js/nav.js"></script>
+</head>
+<body>
+
+  <section class="hero">
+    <div class="hero-badge">📐 RTCCF 規範書・動畫版</div>
+    <h1>規範書流程：先看圖，再施工</h1>
+    <p>AI 動手做 Excel 前，先交一份「試算表規範書」。你看懂、打勾、說「確認」，AI 才產生 xlsx。這一頁讓你看懂規範書每一節管的是什麼。</p>
+  </section>
+
+  <main class="container">
+
+    <!-- 1. 四步流程 -->
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <h2 class="panel-title"><span>🧭</span> 1. 人機協作四步流程</h2>
+          <p class="panel-sub">藍色是你做的事，紫色是 AI 做的事。不限定哪一個 AI，能產生檔案就可以。</p>
+        </div>
+        <button class="replay-btn" id="flowPlay">🔄 重新播放</button>
+      </div>
+      <div class="flow" id="flow">
+        <div class="flow-step" data-step="0">
+          <span class="who you">👤 你</span>
+          <div class="icon">🗣️</div>
+          <h3>① 白話需求</h3>
+          <p>用自己的話說：做什麼用、誰填誰看、記錄什麼、要算什麼。</p>
+          <div class="artifact" data-text="「每月報帳用的表，會計要能篩選部門，總計不要被蓋掉。」"></div>
+        </div>
+        <div class="flow-step" data-step="1">
+          <span class="who ai">🤖 AI</span>
+          <div class="icon">📄</div>
+          <h3>② 寫規範書 .md</h3>
+          <p>依 RTCCF 標準，五大段＋C1～C7。<b>先不做 Excel。</b></p>
+          <div class="artifact" data-text="# Role&#10;# Task&#10;# Context&#10;# Constraints C1～C7&#10;# Format"></div>
+        </div>
+        <div class="flow-step" data-step="2">
+          <span class="who you">👤 你</span>
+          <div class="icon">✅</div>
+          <h3>③ 用檢查清單審核</h3>
+          <p>日期是日期嗎？金額是數值嗎？算出來的都是公式嗎？</p>
+          <div class="artifact" data-text="☑ C2 日期＝日期&#10;☑ C3 小計＝公式&#10;☑ C1 不合併&#10;→ 回覆「確認」"></div>
+        </div>
+        <div class="flow-step" data-step="3">
+          <span class="who ai">🤖 AI</span>
+          <div class="icon">📗</div>
+          <h3>④ 產生 .xlsx</h3>
+          <p>完全照規範書做，並附驗收清單。你打開檔案對照觀察。</p>
+          <div class="artifact" data-text="部門費用報銷表.xlsx&#10;＋ 驗收清單"></div>
+        </div>
+      </div>
+      <p class="loop-note" id="loopNote">↩️ 審核時發現問題？請 AI 修改那一節（例如「C2 的報銷日期改成日期型態」），回到 ②，直到全部打勾。</p>
+    </section>
+
+    <!-- 2. 規範書解剖 -->
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <h2 class="panel-title"><span>🔬</span> 2. 規範書解剖：每一節管 xlsx 的哪裡？</h2>
+          <p class="panel-sub">點左邊的章節，右邊的 xlsx 會亮出它控制的部分。範例以第 04 課《部門費用報銷表》為底；C4 下拉選單與 C5 紅色警示是第 06、07 課才加入的功能，這裡先示範長相。</p>
+        </div>
+      </div>
+      <div class="two-col">
+        <div>
+          <div class="spec-list" id="specList"></div>
+        </div>
+        <div>
+          <span class="mock-file" id="mockFile">📗 部門費用報銷表.xlsx</span>
+          <div class="sheet-scroll" id="mockFrame">
+            <div class="excel-bar">
+              <div class="namebox" id="mockName">A1</div>
+              <div class="fx">fx</div>
+              <div class="formula" id="mockFormula">報銷日期</div>
+            </div>
+            <table class="sheet" id="mockSheet"></table>
+            <div class="sheet-tabs" id="mockTabs"><span class="on">報銷明細</span><span>報銷彙總</span></div>
+          </div>
+          <div class="info-box" id="specInfo" style="margin-top: 14px;" aria-live="polite"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. 檢查清單 -->
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <h2 class="panel-title"><span>☑️</span> 3. 規範書檢查清單（互動版）</h2>
+          <p class="panel-sub">AI 交出規範書後，拿著它逐項打勾。全部打勾，才回覆「確認」。</p>
+        </div>
+        <button class="replay-btn" id="resetChecks">↺ 全部清除</button>
+      </div>
+      <div class="progress" aria-hidden="true"><div id="progressBar"></div></div>
+      <div class="check-groups" id="checkGroups"></div>
+      <div class="confirm-box" id="confirmBox" aria-live="polite"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>📖 文字版：<a href="https://github.com/roberthsu2003/ai-excel-analytics/tree/main/用AI生成Excel/00_RTCCF規範書標準" target="_blank">RTCCF 規範書標準</a> ｜ <a href="https://github.com/roberthsu2003/ai-excel-analytics/blob/main/用AI生成Excel/通用提示詞.md" target="_blank">通用提示詞</a> ｜ 下一步：<a href="./validation-format.html">🛡️ 防呆與警示</a></p>
+  </footer>
+
+  <script>
+    const $ = id => document.getElementById(id);
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // ---------- 1. 四步流程 ----------
+    let flowTimers = [];
+    function typeText(el, text, speed) {
+      el.textContent = "";
+      if (reduced) { el.textContent = text; return; }
+      [...text].forEach((ch, i) => flowTimers.push(setTimeout(() => { el.textContent += ch; }, i * speed)));
+    }
+    function playFlow() {
+      flowTimers.forEach(clearTimeout);
+      flowTimers = [];
+      const steps = document.querySelectorAll(".flow-step");
+      steps.forEach(s => {
+        s.classList.remove("on", "done");
+        s.querySelector(".artifact").textContent = "";
+      });
+      $("loopNote").classList.remove("on");
+      const gap = reduced ? 0 : 2200;
+      steps.forEach((s, i) => {
+        flowTimers.push(setTimeout(() => {
+          steps.forEach((o, j) => { o.classList.toggle("on", j === i); o.classList.toggle("done", j < i); });
+          typeText(s.querySelector(".artifact"), s.querySelector(".artifact").dataset.text, 28);
+          if (i === 2) $("loopNote").classList.add("on");
+        }, i * gap));
+      });
+      flowTimers.push(setTimeout(() => steps.forEach(s => { s.classList.remove("on"); s.classList.add("done"); }), steps.length * gap));
+    }
+    $("flowPlay").addEventListener("click", playFlow);
+
+    // ---------- 2. 規範書解剖 ----------
+    const mockCols = ["A", "B", "C", "D", "E", "F"];
+    const mockHeader = ["報銷日期", "申請部門", "費用類別", "單價", "數量", "小計金額"];
+    const mockTypes = ["日期", "文字", "文字", "數值", "數值", "公式"];
+    const mockRows = [
+      ["2026-03-02", "研發部", "交通差旅", "580", "2", "1,160"],
+      ["2026-03-03", "行銷部", "業務推廣", "12,000", "1", "12,000"],
+      ["2026-03-05", "維運部", "硬體耗材", "450", "6", "2,700"],
+      ["2026-03-08", "研發部", "軟體訂閱", "1,800", "1", "1,800"]
+    ];
+
+    function renderMock() {
+      let html = `<tr><th class="rowhead"></th>${mockCols.map(c => `<th data-col="${c}">${c}</th>`).join("")}</tr>`;
+      html += `<tr class="header"><th class="rowhead">1</th>${mockHeader.map((h, i) =>
+        `<td data-a="${mockCols[i]}1" class="${i === 2 ? "dd" : ""}">${h}${i === 2 ? '<span class="dd-arrow">▼</span><div class="dropdown"><div>交通差旅</div><div>業務推廣</div><div>硬體耗材</div><div>軟體訂閱</div></div>' : ""}</td>`).join("")}</tr>`;
+      html += `<tr class="type-row"><th class="rowhead"></th>${mockTypes.map(t => `<td>${t}</td>`).join("")}</tr>`;
+      mockRows.forEach((row, r) => {
+        const n = r + 2;
+        html += `<tr data-r="${n}"><th class="rowhead">${n}</th>${row.map((v, i) => {
+          const isNum = i >= 3 || i === 0;
+          const over = n === 3 && i === 5 ? "over" : "";
+          return `<td data-a="${mockCols[i]}${n}" class="${isNum ? "num" : "text"} ${over}">${v}</td>`;
+        }).join("")}</tr>`;
+      });
+      $("mockSheet").innerHTML = html;
+    }
+
+    const sections = [
+      { key: "role", label: "# Role", note: "角色", sub: false,
+        text: "告訴 AI 用什麼身分思考。Role 不會出現在 xlsx 裡，但會影響 AI 的判斷，例如「熟悉會計稽核」的 AI 比較會注意金額格式。",
+        snippet: "# Role\n你是一位熟悉會計稽核與 Excel 資料庫式結構的\n資料分析師，確保表格能直接排序、篩選與樞紐分析。",
+        apply: () => {} },
+      { key: "task", label: "# Task", note: "任務與交付物", sub: false,
+        text: "一句話說要做什麼，加上交付物清單：檔名、幾張工作表。對應到 xlsx 的「檔案本身」。",
+        snippet: "# Task\n建立每月報帳用的費用報銷表 …\n- 交付物：`部門費用報銷表.xlsx`，共 2 張工作表",
+        apply: () => [$("mockFile"), $("mockFrame")].forEach(hl) },
+      { key: "context", label: "# Context", note: "用途、一列代表什麼、工作表清單", sub: false,
+        text: "最重要的一句是「一列代表什麼」：這裡一列＝一筆報銷。工作表清單決定下方有哪些分頁，以及哪張是資料層、哪張是展示層。",
+        snippet: "- 一列代表：**一筆報銷**。\n| 工作表   | 角色   |\n| 報銷明細 | 資料層 |\n| 報銷彙總 | 展示層 |",
+        apply: () => { hl($("mockTabs")); rowCells(3).forEach(hl); } },
+      { key: "c1", label: "## C1 結構規則", note: "四不二要、凍結窗格、表格", sub: true,
+        text: "不合併、不留空列、一格一事、第 1 列就是欄位名稱、凍結窗格、結構化表格名稱。看 xlsx 時：表頭下方那條粗線就是凍結窗格。",
+        snippet: "## C1 結構規則\n1. 不合併：資料列不合併儲存格。\n4. 一維表：第 1 列是欄位名稱 …\n6. 凍結窗格：`A2`。\n7. 結構化表格：名稱 `T_Expense`",
+        apply: () => { $("mockSheet").classList.add("freeze-line"); headerCells().forEach(hl); } },
+      { key: "c2", label: "## C2 欄位定義表", note: "最重要：每欄的型態與格式", sub: true,
+        text: "每一欄的角色、資料型態、顯示格式。灰色那一列就是 C2 規定的型態。審核重點：日期是「日期」、金額是「數值」、小計是「公式」。",
+        snippet: "| 欄 | 欄位名稱 | 角色 | 資料型態 | 顯示格式 |\n| B  | 報銷日期 | 條件 | 日期     | yyyy-mm-dd |\n| G  | 單價     | 指標 | 數值     | #,##0 |",
+        apply: () => { $("mockSheet").classList.add("show-types"); headerCells().forEach(hl); } },
+      { key: "c3", label: "## C3 公式", note: "算出來的都要是公式", sub: true,
+        text: "所有計算欄位都列在這裡。對應到 xlsx：點小計那一格，資料編輯列會顯示公式，而不是數字。",
+        snippet: "| 欄位     | 公式     | 白話說明    |\n| 小計金額 | =G2*H2   | 單價 × 數量 |\n| 總計     | =SUM(T_Expense[小計金額]) |",
+        apply: () => { colCells("F").forEach(hl); $("mockName").textContent = "F2"; $("mockFormula").textContent = "=D2*E2"; } },
+      { key: "c4", label: "## C4 資料驗證", note: "下拉選單、範圍限制", sub: true,
+        text: "哪些欄位只能從選單挑、數字有沒有範圍。對應到 xlsx：點那一格會出現 ▼，選項來自選項清單（第 06 課）。",
+        snippet: "| 範圍  | 規則                         |\n| C2:C200 | 清單：='選項清單'!$B$2:$B$7 |",
+        apply: () => { $("mockSheet").classList.add("show-dd"); hl(document.querySelector('[data-a="C1"]')); } },
+      { key: "c5", label: "## C5 條件式格式", note: "自動警示", sub: true,
+        text: "符合條件就自動變色。這裡的規則是「單筆小計超過 10,000 標紅」，所以第 3 列的 12,000 變紅（第 07 課）。",
+        snippet: "| 範圍  | 條件          | 樣式         |\n| F2:F200 | 大於 10000 | 深紅字、淡紅底 |",
+        apply: () => { $("mockSheet").classList.add("show-cf"); } },
+      { key: "c6", label: "## C6 版面與樣式", note: "字型、表頭顏色、欄寬", sub: true,
+        text: "影響「好不好看」，不影響「對不對」。點這一節時表頭會先變灰再換回綠色，示範 C6 只管外觀。",
+        snippet: "## C6 版面與樣式\n- 字型：微軟正黑體\n- 表頭：深藍底、白字、粗體\n- 欄寬：15、12、10 …",
+        apply: () => {
+          $("mockSheet").classList.add("plain");
+          setTimeout(() => { $("mockSheet").classList.remove("plain"); headerCells().forEach(hl); }, reduced ? 0 : 700);
+        } },
+      { key: "c7", label: "## C7 示範資料", note: "筆數、測試值、預期結果", sub: true,
+        text: "要幾筆資料、刻意放什麼測試值、預期結果是多少。打開 xlsx 時，就用這些測試值檢查公式和警示有沒有作用。",
+        snippet: "## C7 示範資料\n- 筆數：10 筆\n- 刻意放入的測試值：EXP-002 小計 12,000\n  → 應觸發 C5 紅色警示\n- 預期結果：報銷總計 70,310",
+        apply: () => rowCells(3).forEach(hl) },
+      { key: "format", label: "# Format", note: "先規範書，確認後才產生", sub: false,
+        text: "固定三段式：只交規範書 → 等你說「確認」→ 產生 xlsx 並附驗收清單。這一節保證 AI 不會跳過你的審核。",
+        snippet: "# Format\n1. 只輸出本規範書，先不要產生 Excel。\n2. 等使用者回覆「確認」後才產生 .xlsx。\n3. 附驗收清單。",
+        apply: () => {} }
+    ];
+
+    function hl(el) { if (el) el.classList.add("hl"); }
+    function rowCells(n) { return [...document.querySelectorAll(`#mockSheet tr[data-r="${n}"] td`)]; }
+    function colCells(c) { return [...document.querySelectorAll(`#mockSheet td[data-a^="${c}"]`)].filter(td => td.dataset.a !== c + "1"); }
+    function headerCells() { return [...document.querySelectorAll("#mockSheet tr.header td")]; }
+
+    function selectSection(key) {
+      const s = sections.find(x => x.key === key);
+      document.querySelectorAll(".spec-item").forEach(b => b.classList.toggle("active", b.dataset.key === key));
+      document.querySelectorAll(".hl").forEach(el => el.classList.remove("hl"));
+      $("mockSheet").classList.remove("show-types", "show-dd", "show-cf", "freeze-line", "plain");
+      $("mockName").textContent = "A1";
+      $("mockFormula").textContent = "報銷日期";
+      requestAnimationFrame(() => s.apply());
+      $("specInfo").innerHTML = `<h3>${s.label}　<span style="font-weight:600;color:var(--slate-500);font-size:0.9rem;">${s.note}</span></h3><p>${s.text}</p><div class="snippet"></div>`;
+      $("specInfo").querySelector(".snippet").textContent = s.snippet;
+      $("specInfo").style.animation = "none";
+      requestAnimationFrame(() => $("specInfo").style.animation = "");
+    }
+
+    $("specList").innerHTML = sections.map(s =>
+      `<button class="spec-item ${s.sub ? "sub" : ""}" data-key="${s.key}">${s.label}<small>${s.note}</small></button>`).join("");
+    $("specList").addEventListener("click", e => {
+      const btn = e.target.closest(".spec-item");
+      if (btn) selectSection(btn.dataset.key);
+    });
+
+    // ---------- 3. 檢查清單 ----------
+    const checklist = [
+      { title: "結構齊全", items: ["五大段 Role、Task、Context、Constraints、Format 都有", "C1～C7 七小節都有（沒用到寫「本課不適用」）"] },
+      { title: "Context", items: ["寫出「一列代表什麼」", "資料層和展示層的工作表分開"] },
+      { title: "C1 結構", items: ["資料列不合併儲存格", "總計不緊貼在資料最後一列下面"] },
+      { title: "C2 欄位定義表", items: ["日期欄的資料型態是「日期」", "金額、數量是「數值」，不含元、NT$", "要保留前導 0 的編號是「文字」"] },
+      { title: "C3 公式", items: ["算出來的欄位都列在 C3，沒有填死的數字", "參照固定格子（稅率）時有用 $"] },
+      { title: "C7 與 Format", items: ["有刻意放入的測試值與預期結果", "寫明確認後才產生 xlsx，並附驗收清單"] }
+    ];
+    $("checkGroups").innerHTML = checklist.map((g, gi) => `
+      <div class="check-group"><h4>${g.title}</h4>
+        ${g.items.map((it, ii) => `<label><input type="checkbox" data-id="${gi}-${ii}"><span>${it}</span></label>`).join("")}
+      </div>`).join("");
+    const boxes = [...document.querySelectorAll("#checkGroups input")];
+
+    function updateChecks() {
+      const done = boxes.filter(b => b.checked).length;
+      $("progressBar").style.width = `${(done / boxes.length) * 100}%`;
+      const box = $("confirmBox");
+      if (done === boxes.length) {
+        box.classList.add("ready");
+        box.innerHTML = `🎉 全部通過！可以回覆 AI：<code>規範書確認，請完全依照規範書產生 .xlsx，並附驗收清單。</code>`;
+      } else {
+        box.classList.remove("ready");
+        box.textContent = `已檢查 ${done} / ${boxes.length} 項。還有沒打勾的項目，就請 AI 修改那一節，先不要說「確認」。`;
+      }
+    }
+    boxes.forEach(b => b.addEventListener("change", updateChecks));
+    $("resetChecks").addEventListener("click", () => { boxes.forEach(b => { b.checked = false; }); updateChecks(); });
+
+    renderMock();
+    selectSection("c2");
+    updateChecks();
+    playFlow();
+  </script>
+</body>
+</html>

@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Excel 名詞圖鑑 | 用 AI 生成 Excel</title>
+  <meta name="description" content="點選名詞，在模擬試算表上看見欄、列、儲存格、範圍、資料編輯列在哪裡；再看懂值與顯示格式、資料型態與錯誤代碼。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/common.css">
+  <style>
+    .book-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--slate-600);
+      margin-bottom: 8px;
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+    }
+    .book-title.hl { box-shadow: 0 0 0 2px var(--warning); }
+    table.sheet td { cursor: pointer; }
+    table.sheet td:hover { outline: 1px solid var(--excel); }
+    .cell-meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .meta-item {
+      background: var(--slate-50);
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-sm);
+      padding: 8px 10px;
+      font-size: 0.82rem;
+    }
+    .meta-item b { display: block; font-size: 0.95rem; color: var(--slate-900); }
+
+    /* 值與格式翻牌 */
+    .flip-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 14px;
+    }
+    .flip {
+      border: 1.5px solid var(--slate-200);
+      border-radius: var(--radius-md);
+      background: #fff;
+      padding: 14px;
+      cursor: pointer;
+      text-align: left;
+      font: inherit;
+      transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+    .flip:hover { border-color: var(--primary); transform: translateY(-2px); }
+    .flip .shown {
+      font-size: 0.75rem;
+      color: var(--slate-500);
+      font-weight: 700;
+    }
+    .flip .cellbox {
+      margin: 6px 0 10px;
+      border: 1px solid var(--slate-300);
+      padding: 6px 10px;
+      font-size: 1.05rem;
+      font-variant-numeric: tabular-nums;
+      background: #fff;
+    }
+    .flip .back { display: none; font-size: 0.85rem; }
+    .flip.open .back { display: block; animation: fadeIn 0.35s ease; }
+    .flip.open .hint { display: none; }
+    .flip .hint { font-size: 0.8rem; color: var(--primary-dark); font-weight: 700; }
+    .tag {
+      display: inline-block;
+      padding: 1px 8px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    .tag.ok { background: var(--primary-light); color: var(--primary-dark); }
+    .tag.ng { background: var(--danger-light); color: var(--danger); }
+
+    /* SUM 對決 */
+    .duel {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+    .duel-col {
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-md);
+      padding: 14px;
+    }
+    .duel-col h4 { font-size: 0.95rem; margin-bottom: 8px; }
+    .duel-col .row {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px dashed var(--slate-200);
+      padding: 5px 2px;
+      font-variant-numeric: tabular-nums;
+      opacity: 0;
+    }
+    .duel-col .row.in { opacity: 1; animation: fadeIn 0.3s ease; }
+    .duel-col .sum {
+      margin-top: 10px;
+      font-weight: 800;
+      font-size: 1.1rem;
+      display: flex;
+      justify-content: space-between;
+      opacity: 0;
+    }
+    .duel-col .sum.in { opacity: 1; animation: pop 0.45s ease; }
+
+    .err-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+    }
+    .err {
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      background: #fff;
+    }
+    .err code {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--danger);
+    }
+    .err.fine code { color: var(--slate-600); }
+    .err p { font-size: 0.86rem; color: var(--slate-600); margin-top: 4px; }
+  </style>
+  <script src="./js/nav.js"></script>
+</head>
+<body>
+
+  <section class="hero">
+    <div class="hero-badge">📘 第 00 課・互動版</div>
+    <h1>Excel 名詞圖鑑</h1>
+    <p>不用打開 Excel，也不用操作。點一下名詞，看它在畫面上的哪裡；認得這些字，才看得懂 AI 寫的規範書。</p>
+  </section>
+
+  <main class="container">
+
+    <!-- 1. 畫面名詞 -->
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <h2 class="panel-title"><span>🖥️</span> 1. 畫面上的名詞</h2>
+          <p class="panel-sub">點選名詞看位置；也可以直接點表格裡的任何一格，看「名稱方塊」與「資料編輯列」怎麼變。</p>
+        </div>
+      </div>
+      <div class="two-col">
+        <div>
+          <div class="chip-row" id="termChips" role="group" aria-label="名詞清單"></div>
+          <div class="info-box" id="termInfo" style="margin-top: 16px;" aria-live="polite"></div>
+        </div>
+        <div>
+          <span class="book-title" id="bookTitle">📗 報價單.xlsx</span>
+          <div class="sheet-scroll" id="sheetFrame">
+            <div class="excel-bar">
+              <div class="namebox" id="nameBox">D2</div>
+              <div class="fx">fx</div>
+              <div class="formula" id="formulaBar">=B2*C2</div>
+            </div>
+            <table class="sheet" id="sheet" aria-label="模擬試算表"></table>
+            <div class="sheet-tabs" id="sheetTabs"><span class="on">報價單</span><span>統計</span><span>＋</span></div>
+          </div>
+          <div class="cell-meta" id="cellMeta"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. 值 vs 顯示格式 -->
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <h2 class="panel-title"><span>🔍</span> 2. 看起來一樣，裡面不一樣：值 vs. 顯示格式</h2>
+          <p class="panel-sub">點每張卡片翻開，看儲存格「真正的值」與「資料型態」。這就是規範書 C2 要分開寫「資料型態」和「顯示格式」的原因。</p>
+        </div>
+      </div>
+      <div class="flip-grid" id="flipGrid"></div>
+    </section>
+
+    <!-- 3. SUM 對決 -->
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <h2 class="panel-title"><span>➕</span> 3. 文字 vs. 數值：加總對決</h2>
+          <p class="panel-sub">同樣三筆金額，一邊多打了「元」「NT$」，一邊是純數值。按下播放，看 <code>=SUM()</code> 算出什麼。</p>
+        </div>
+        <button class="play-btn" id="duelBtn">▶ 播放加總</button>
+      </div>
+      <div class="duel">
+        <div class="duel-col">
+          <h4>❌ 存成文字（多打了單位）</h4>
+          <div class="row"><span>1500</span><span>靠左＝文字</span></div>
+          <div class="row"><span>2,000元</span><span>文字</span></div>
+          <div class="row"><span>NT$3500</span><span>文字</span></div>
+          <div class="sum bad"><span>=SUM()</span><span>0</span></div>
+        </div>
+        <div class="duel-col">
+          <h4>✅ 存成數值（單位交給格式）</h4>
+          <div class="row"><span>靠右＝數值</span><span>1,500</span></div>
+          <div class="row"><span></span><span>2,000</span></div>
+          <div class="row"><span></span><span>3,500</span></div>
+          <div class="sum" style="color: var(--primary-dark);"><span>=SUM()</span><span>7,000</span></div>
+        </div>
+      </div>
+      <p class="tip">💡 打開第 01 課的 <code>社團收支紀錄.xlsx</code>，「型態對照」工作表第 5 列就是這個對決的真實版本。</p>
+    </section>
+
+    <!-- 4. 錯誤代碼 -->
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <h2 class="panel-title"><span>🚨</span> 4. 錯誤代碼：看到不要慌</h2>
+          <p class="panel-sub">驗收 AI 做的 xlsx 時，看到這些代碼就知道往哪裡找原因。</p>
+        </div>
+      </div>
+      <div class="err-grid">
+        <div class="err"><code>#VALUE!</code><p>型態不對：拿文字做數學，例如「180元」× 1。上面表格的 D4 就是。</p></div>
+        <div class="err"><code>#N/A</code><p>找不到：XLOOKUP 查不到這個編號（第 08 課）。</p></div>
+        <div class="err"><code>#REF!</code><p>參照不見了：公式指向的欄或工作表被刪除。</p></div>
+        <div class="err"><code>#DIV/0!</code><p>除以 0：分母是 0 或空白，要用 IF 防呆。</p></div>
+        <div class="err"><code>#NAME?</code><p>不認得名稱：函數打錯，或舊版 Excel 沒有 XLOOKUP、IFS。</p></div>
+        <div class="err fine"><code>#####</code><p>不是錯誤：欄太窄放不下，拉寬就好。</p></div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>📖 完整文字版：<a href="https://github.com/roberthsu2003/ai-excel-analytics/tree/main/用AI生成Excel/00_Excel基本觀念" target="_blank">00 Excel 基本觀念</a> ｜ 下一步：<a href="./formula-reference.html">🔗 公式與參照動畫</a></p>
+  </footer>
+
+  <script>
+    // 模擬試算表的內容：display 是畫面上看到的，raw 是資料編輯列顯示的
+    const cells = {
+      A1: { display: "品名", raw: "品名", type: "文字", fmt: "通用", header: true },
+      B1: { display: "單價", raw: "單價", type: "文字", fmt: "通用", header: true },
+      C1: { display: "數量", raw: "數量", type: "文字", fmt: "通用", header: true },
+      D1: { display: "小計", raw: "小計", type: "文字", fmt: "通用", header: true },
+      A2: { display: "原子筆", raw: "原子筆", type: "文字", fmt: "通用" },
+      B2: { display: "20", raw: "20", type: "數值", fmt: "#,##0" },
+      C2: { display: "3", raw: "3", type: "數值", fmt: "#,##0" },
+      D2: { display: "60", raw: "=B2*C2", type: "公式（結果是數值）", fmt: "#,##0" },
+      A3: { display: "便利貼", raw: "便利貼", type: "文字", fmt: "通用" },
+      B3: { display: "45", raw: "45", type: "數值", fmt: "#,##0" },
+      C3: { display: "2", raw: "2", type: "數值", fmt: "#,##0" },
+      D3: { display: "90", raw: "=B3*C3", type: "公式（結果是數值）", fmt: "#,##0" },
+      A4: { display: "釘書機", raw: "釘書機", type: "文字", fmt: "通用" },
+      B4: { display: "180元", raw: "180元", type: "文字 ⚠️ 多打了「元」", fmt: "通用", text: true },
+      C4: { display: "1", raw: "1", type: "數值", fmt: "#,##0" },
+      D4: { display: "#VALUE!", raw: "=B4*C4", type: "公式（錯誤：B4 是文字）", fmt: "#,##0", error: true }
+    };
+    const cols = ["A", "B", "C", "D"];
+    const rows = [1, 2, 3, 4];
+
+    const terms = [
+      { key: "workbook", name: "活頁簿", en: "Workbook", desc: "一個 .xlsx 檔案就是一本活頁簿，裡面可以有很多張工作表。", where: "規範書 Task：交付物", target: () => [byId("sheetFrame"), byId("bookTitle")] },
+      { key: "sheet", name: "工作表", en: "Worksheet", desc: "活頁簿裡的一頁。下方的標籤可以切換，「報價單」「統計」各是一張工作表。", where: "規範書 Context：工作表清單", target: () => [byId("sheetTabs")] },
+      { key: "col", name: "欄", en: "Column", desc: "直的一整排，用英文字母命名。這裡亮起來的是 C 欄（數量）。", where: "規範書 C2：「欄」那一行", target: () => colCells("C") },
+      { key: "row", name: "列", en: "Row", desc: "橫的一整排，用數字命名。這裡亮起來的是第 3 列（便利貼那一筆）。一列就是一筆資料。", where: "規範書 C1：資料從第 2 列開始", target: () => rowCells(3) },
+      { key: "cell", name: "儲存格", en: "Cell", desc: "欄和列交叉的一格，是存放資料的最小單位。", where: "全部章節", target: () => [cellEl("D2")], select: "D2" },
+      { key: "address", name: "儲存格位址", en: "Cell Reference", desc: "先寫欄、再寫列。D 欄第 2 列就是 D2，會顯示在左上角的名稱方塊。", where: "規範書 C3：公式裡的 B2、C2", target: () => [cellEl("D2"), byId("nameBox")], select: "D2" },
+      { key: "range", name: "範圍", en: "Range", desc: "一塊連續的儲存格。B2:C4 表示從 B2 到 C4 的長方形，共 6 格。", where: "規範書 C3、C4、C5", target: () => ["B2","B3","B4","C2","C3","C4"].map(cellEl) },
+      { key: "header", name: "欄位名稱", en: "Header", desc: "第 1 列的標題，說明每一欄放什麼。AI 做的表第 1 列就該是欄位名稱，不是大標題。", where: "規範書 C2：欄位名稱", target: () => rowCells(1) },
+      { key: "namebox", name: "名稱方塊", en: "Name Box", desc: "左上角的小方框，顯示你目前選到哪一格。", where: "驗收時用", target: () => [byId("nameBox")] },
+      { key: "formula", name: "資料編輯列", en: "Formula Bar", desc: "fx 右邊那一條，顯示儲存格「真正的內容」。D2 畫面上是 60，這裡卻是 =B2*C2，代表它是公式。驗收 AI 的檔案時，最重要就是看這裡。", where: "每一課的觀察任務", target: () => [byId("formulaBar")], select: "D2" }
+    ];
+
+    function byId(id) { return document.getElementById(id); }
+    function cellEl(addr) { return document.querySelector(`[data-addr="${addr}"]`); }
+    function colCells(c) { return [document.querySelector(`th[data-col="${c}"]`), ...rows.map(r => cellEl(c + r))]; }
+    function rowCells(r) { return [document.querySelector(`th[data-row="${r}"]`), ...cols.map(c => cellEl(c + r))]; }
+
+    function renderSheet() {
+      let html = `<tr><th class="rowhead"></th>${cols.map(c => `<th data-col="${c}">${c}</th>`).join("")}</tr>`;
+      rows.forEach(r => {
+        html += `<tr class="${r === 1 ? "header" : ""}"><th class="rowhead" data-row="${r}">${r}</th>`;
+        cols.forEach(c => {
+          const cell = cells[c + r];
+          const isNum = !cell.header && !cell.text && c !== "A";
+          html += `<td data-addr="${c + r}" class="${isNum ? "num" : "text"} ${cell.error ? "bad" : ""}" tabindex="0">${cell.display}</td>`;
+        });
+        html += "</tr>";
+      });
+      byId("sheet").innerHTML = html;
+      byId("sheet").addEventListener("click", e => {
+        const td = e.target.closest("td[data-addr]");
+        if (td) { clearHighlights(); selectCell(td.dataset.addr); }
+      });
+      byId("sheet").addEventListener("keydown", e => {
+        const td = e.target.closest("td[data-addr]");
+        if (td && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); clearHighlights(); selectCell(td.dataset.addr); }
+      });
+    }
+
+    function selectCell(addr) {
+      document.querySelectorAll(".cell-active").forEach(el => el.classList.remove("cell-active"));
+      cellEl(addr).classList.add("cell-active");
+      const cell = cells[addr];
+      byId("nameBox").textContent = addr;
+      byId("formulaBar").textContent = cell.raw;
+      const align = cell.header || cell.text || addr[0] === "A" ? "靠左（文字）" : "靠右（數值）";
+      byId("cellMeta").innerHTML = `
+        <div class="meta-item">畫面顯示<b>${cell.display}</b></div>
+        <div class="meta-item">真正的內容<b class="mono">${cell.raw}</b></div>
+        <div class="meta-item">資料型態<b>${cell.type}</b></div>
+        <div class="meta-item">對齊<b>${cell.error ? "—" : align}</b></div>`;
+    }
+
+    function clearHighlights() {
+      document.querySelectorAll(".hl").forEach(el => el.classList.remove("hl"));
+    }
+
+    function selectTerm(key) {
+      const term = terms.find(t => t.key === key);
+      document.querySelectorAll("#termChips .chip").forEach(b => b.classList.toggle("active", b.dataset.key === key));
+      clearHighlights();
+      if (term.select) selectCell(term.select);
+      // 重新觸發動畫：先移除再加回
+      requestAnimationFrame(() => term.target().forEach(el => el && el.classList.add("hl")));
+      byId("termInfo").innerHTML = `
+        <h3>${term.name} <span style="font-weight:600;color:var(--slate-500);font-size:0.9rem;">${term.en}</span></h3>
+        <p>${term.desc}</p>
+        <span class="where">📐 ${term.where}</span>`;
+      byId("termInfo").style.animation = "none";
+      requestAnimationFrame(() => byId("termInfo").style.animation = "");
+    }
+
+    function renderChips() {
+      byId("termChips").innerHTML = terms.map(t => `<button class="chip" data-key="${t.key}">${t.name}</button>`).join("");
+      byId("termChips").addEventListener("click", e => {
+        const btn = e.target.closest(".chip");
+        if (btn) selectTerm(btn.dataset.key);
+      });
+    }
+
+    // 值 vs 顯示格式
+    const flips = [
+      { shown: "12,000", align: "right", ok: true, raw: "12000", type: "數值", fmt: "#,##0（千分位）", note: "逗號只是外觀，可以加總。" },
+      { shown: "12,000元", align: "left", ok: false, raw: "\"12,000元\"", type: "文字", fmt: "無", note: "多打了「元」就變文字，SUM 會當它不存在。" },
+      { shown: "5%", align: "right", ok: true, raw: "0.05", type: "百分比（數值）", fmt: "0%", note: "稅率、達成率都是這樣存。" },
+      { shown: "2026-03-02", align: "right", ok: true, raw: "日期 2026/3/2", type: "日期", fmt: "yyyy-mm-dd", note: "可以排序、取月份、算天數。" },
+      { shown: "115.03.02", align: "left", ok: false, raw: "\"115.03.02\"", type: "文字", fmt: "無", note: "民國年加句點，Excel 認不得是日期。" },
+      { shown: "0012", align: "left", ok: true, raw: "\"0012\"", type: "文字", fmt: "文字（@）", note: "編號要保留前導 0，所以「刻意」存成文字。" }
+    ];
+
+    function renderFlips() {
+      byId("flipGrid").innerHTML = flips.map((f, i) => `
+        <button class="flip" data-i="${i}" aria-expanded="false">
+          <div class="shown">儲存格顯示</div>
+          <div class="cellbox" style="text-align:${f.align === "right" ? "right" : "left"}">${f.shown}</div>
+          <div class="hint">👆 點我翻開</div>
+          <div class="back">
+            <span class="tag ${f.ok ? "ok" : "ng"}">${f.ok ? "✅ 正確" : "❌ 會出問題"}</span>
+            <div>真正的值：<b class="mono">${f.raw}</b></div>
+            <div>資料型態：<b>${f.type}</b></div>
+            <div>顯示格式：<b>${f.fmt}</b></div>
+            <div style="color:var(--slate-600);margin-top:4px;">${f.note}</div>
+          </div>
+        </button>`).join("");
+      byId("flipGrid").addEventListener("click", e => {
+        const card = e.target.closest(".flip");
+        if (!card) return;
+        const open = card.classList.toggle("open");
+        card.setAttribute("aria-expanded", open);
+      });
+    }
+
+    // SUM 對決動畫
+    let duelTimers = [];
+    function playDuel() {
+      duelTimers.forEach(clearTimeout);
+      duelTimers = [];
+      const parts = document.querySelectorAll(".duel-col .row, .duel-col .sum");
+      parts.forEach(el => el.classList.remove("in"));
+      document.querySelectorAll(".duel-col").forEach(col => {
+        col.querySelectorAll(".row").forEach((row, i) => duelTimers.push(setTimeout(() => row.classList.add("in"), 300 + i * 350)));
+        duelTimers.push(setTimeout(() => col.querySelector(".sum").classList.add("in"), 1500));
+      });
+    }
+    byId("duelBtn").addEventListener("click", playDuel);
+
+    renderSheet();
+    renderChips();
+    renderFlips();
+    selectTerm("formula");
+    playDuel();
+  </script>
+</body>
+</html>
