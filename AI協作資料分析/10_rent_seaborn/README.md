@@ -1,6 +1,6 @@
 # 📊 10｜台北租屋：先抓異常值，再用每坪租金公平比較
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/AI%E5%8D%94%E4%BD%9C%E8%B3%87%E6%96%99%E5%88%86%E6%9E%90_12%E5%80%8B%E7%AF%84%E4%BE%8B/10_rent_seaborn/lesson.ipynb) 👉 **[開啟本例筆記本 lesson.ipynb](./lesson.ipynb)**
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/AI%E5%8D%94%E4%BD%9C%E8%B3%87%E6%96%99%E5%88%86%E6%9E%90/10_rent_seaborn/lesson.ipynb) 👉 **[開啟本例筆記本 lesson.ipynb](./lesson.ipynb)**
 
 | [⬅️ 09 六城市氣象](../09_weather_charts/README.md) | [🏠 範例庫目錄](../README.md) | [11 業務週報 ➡️](../11_sales_kpi_style/README.md) |
 | :--- | :---: | ---: |

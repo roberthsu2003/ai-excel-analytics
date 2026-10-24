@@ -1,6 +1,6 @@
 # 📊 04｜社區活動問卷：先清理重複與寫法，再看滿意度
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/AI%E5%8D%94%E4%BD%9C%E8%B3%87%E6%96%99%E5%88%86%E6%9E%90_12%E5%80%8B%E7%AF%84%E4%BE%8B/04_survey_cleaning/lesson.ipynb) 👉 **[開啟本例筆記本 lesson.ipynb](./lesson.ipynb)**
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/AI%E5%8D%94%E4%BD%9C%E8%B3%87%E6%96%99%E5%88%86%E6%9E%90/04_survey_cleaning/lesson.ipynb) 👉 **[開啟本例筆記本 lesson.ipynb](./lesson.ipynb)**
 
 | [⬅️ 03 圖書館借閱](../03_library_files/README.md) | [🏠 範例庫目錄](../README.md) | [05 連鎖書店季報 ➡️](../05_bookstore_merge/README.md) |
 | :--- | :---: | ---: |

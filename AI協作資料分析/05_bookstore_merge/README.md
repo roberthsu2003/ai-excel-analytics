@@ -1,6 +1,6 @@
 # 📊 05｜連鎖書店季報：多表合併，先核對對不上的資料
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/AI%E5%8D%94%E4%BD%9C%E8%B3%87%E6%96%99%E5%88%86%E6%9E%90_12%E5%80%8B%E7%AF%84%E4%BE%8B/05_bookstore_merge/lesson.ipynb) 👉 **[開啟本例筆記本 lesson.ipynb](./lesson.ipynb)**
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/AI%E5%8D%94%E4%BD%9C%E8%B3%87%E6%96%99%E5%88%86%E6%9E%90/05_bookstore_merge/lesson.ipynb) 👉 **[開啟本例筆記本 lesson.ipynb](./lesson.ipynb)**
 
 | [⬅️ 04 社區活動問卷](../04_survey_cleaning/README.md) | [🏠 範例庫目錄](../README.md) | [06 縣市用電 ➡️](../06_power_reshape/README.md) |
 | :--- | :---: | ---: |

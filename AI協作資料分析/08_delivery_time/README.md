@@ -1,6 +1,6 @@
 # 📊 08｜外送訂單：先把 UTC 換成台灣時間，再看尖峰時段
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/AI%E5%8D%94%E4%BD%9C%E8%B3%87%E6%96%99%E5%88%86%E6%9E%90_12%E5%80%8B%E7%AF%84%E4%BE%8B/08_delivery_time/lesson.ipynb) 👉 **[開啟本例筆記本 lesson.ipynb](./lesson.ipynb)**
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/AI%E5%8D%94%E4%BD%9C%E8%B3%87%E6%96%99%E5%88%86%E6%9E%90/08_delivery_time/lesson.ipynb) 👉 **[開啟本例筆記本 lesson.ipynb](./lesson.ipynb)**
 
 | [⬅️ 07 健身房會員](../07_gym_groupby/README.md) | [🏠 範例庫目錄](../README.md) | [09 六城市氣象 ➡️](../09_weather_charts/README.md) |
 | :--- | :---: | ---: |
