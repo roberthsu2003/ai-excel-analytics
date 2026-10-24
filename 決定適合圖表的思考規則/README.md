@@ -244,9 +244,7 @@ graph TD
 ---
 
 ## 🔗 相關章節與練習
-
-- 🧪 實機練習：[五類圖表練習資料（Excel）](../學生素材/五類圖表_練習資料.xlsx)
-- 💻 線上執行範例：[開啟完整示範 Notebook (Colab)](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/README.ipynb)
+- 🤖 實機演練：[第 7 課：和 AI 協作的三階提問法（附 3 個 Colab 實作演練）](../和AI協作的三階提問法/README.md)
 ---
 
 ### 🧭 課程導覽
