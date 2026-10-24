@@ -84,24 +84,24 @@ AI 很會寫程式，但它不知道資料的**一列代表什麼**、你真正�
 
 ## 💻 三個 Colab 實作
 
-三份資料都是**本課原創的課堂合成資料**，各自存成 xlsx。每本筆記本都有完整的第一、第二與第三階 prompt。第 2 階起由 AI 負責撰寫程式、產出數字表與繪圖。
+三份資料都是**本課原創的課堂合成資料**，各自存成 xlsx。每本筆記本都有完整的第一、第二與第三階 prompt。除第 0 格載入資料外，所有程式碼、數字表、圖表與解讀完全由 AI 負責。
 
-| 順序 | 情境與核心問題 | 選圖與資料邊界 | 筆記本與資料 |
+| 順序 | 資料情境與範例問題 | 資料特性與邊界 | 筆記本與資料 |
 | :---: | :--- | :--- | :--- |
-| **01** | 社區服務案件：哪個服務類別處理較久？ | **比較／水平長條圖**；8 個長名稱，處理中案件排除 | [在 Colab 開啟](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/%E5%92%8CAI%E5%8D%94%E4%BD%9C%E7%9A%84%E4%B8%89%E9%9A%8E%E6%8F%90%E5%95%8F%E6%B3%95/01_%E7%A4%BE%E5%8D%80%E6%9C%8D%E5%8B%99%E6%A1%88%E4%BB%B6.ipynb) · [xlsx](./資料集/社區服務案件.xlsx) |
-| **02** | 單車租借月報：每月次數如何變化？ | **趨勢／折線圖**；12 個月，雨天數不能單獨證明原因 | [在 Colab 開啟](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/%E5%92%8CAI%E5%8D%94%E4%BD%9C%E7%9A%84%E4%B8%89%E9%9A%8E%E6%8F%90%E5%95%8F%E6%B3%95/02_%E5%96%AE%E8%BB%8A%E7%A7%9F%E5%80%9F%E6%9C%88%E5%A0%B1.ipynb) · [xlsx](./資料集/單車租借月報.xlsx) |
-| **03** | 閱讀時間與測驗：兩個數值有關嗎？ | **關係／散佈圖**；排除缺分數者，關聯不等於因果 | [在 Colab 開啟](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/%E5%92%8CAI%E5%8D%94%E4%BD%9C%E7%9A%84%E4%B8%89%E9%9A%8E%E6%8F%90%E5%95%8F%E6%B3%95/03_%E9%96%B1%E8%AE%80%E6%99%82%E9%96%93%E8%88%87%E6%B8%AC%E9%A9%97.ipynb) · [xlsx](./資料集/閱讀時間與測驗.xlsx) |
+| **01** | 社區服務案件：哪個服務類別處理較久？ | 8 個長名稱類別，處理中案件排除（未結案無時數） | [在 Colab 開啟](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/%E5%92%8CAI%E5%8D%94%E4%BD%9C%E7%9A%84%E4%B8%89%E9%9A%8E%E6%8F%90%E5%95%8F%E6%B3%95/01_%E7%A4%BE%E5%8D%80%E6%9C%8D%E5%8B%99%E6%A1%88%E4%BB%B6.ipynb) · [xlsx](./資料集/社區服務案件.xlsx) |
+| **02** | 單車租借月報：每月次數如何變化？ | 12 個月時間數列，月總計無逐日細節（不把雨天當唯一因果） | [在 Colab 開啟](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/%E5%92%8CAI%E5%8D%94%E4%BD%9C%E7%9A%84%E4%B8%89%E9%9A%8E%E6%8F%90%E5%95%8F%E6%B3%95/02_%E5%96%AE%E8%BB%8A%E7%A7%9F%E5%80%9F%E6%9C%88%E5%A0%B1.ipynb) · [xlsx](./資料集/單車租借月報.xlsx) |
+| **03** | 閱讀時間與測驗：兩個數值有關嗎？ | 64 位學生連續數值，部分缺分數（相關不等於因果） | [在 Colab 開啟](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/%E5%92%8CAI%E5%8D%94%E4%BD%9C%E7%9A%84%E4%B8%89%E9%9A%8E%E6%8F%90%E5%95%8F%E6%B3%95/03_%E9%96%B1%E8%AE%80%E6%99%82%E9%96%93%E8%88%87%E6%B8%AC%E9%A9%97.ipynb) · [xlsx](./資料集/閱讀時間與測驗.xlsx) |
 
 每本筆記本第一格也有 **「在 Colab 開啟」** 按鈕。[三份資料的欄位與使用邊界](./資料集/DATA_CARD.md) 可供教師備課和學生驗收。
 
 ### 使用方式
 
 1. 點表格中的「在 Colab 開啟」，執行第 **0** 格；它會讀取相應的 xlsx，並沿用前面章節的 `mplfonts`／`Noto Sans CJK SC` 繁體中文字型設定。
-2. 執行第 **1** 格核對前 5 列與缺值數。進入第二階時，將選定的問題貼給 AI，請 AI 建議圖表並分析優缺點。
-3. 看完 AI 分析並決定圖表後，請 AI 執行運算並只畫一張圖。
-4. 第二階完成後，在**同一段對話**貼上 **③ 第三階 Prompt**，請 AI 透過數據與圖表解釋結論、洞察與限制。
+2. 將 **① 第一階 Prompt** 貼給 Colab Gemini，由 AI 寫程式顯示前 5 列、檢查缺值並提出 5 個可分析的問題。
+3. 進入 **② 第二階**，將選定的問題貼給 AI 請它建議圖表並分析優缺點；決定圖表後請 AI 執行運算並只畫一張圖。
+4. 第二階完成後，在**同一段對話**貼上 **③ 第三階 Prompt**，請 AI 透過數據與圖表解釋結論、洞察與限制。可挑選其他問題重複第二、三階練習！
 
-> 若 AI 無法直接讀取 `df`，先執行第一階參考程式，將前 5 列、欄位與缺值數一併貼給它。
+> 💡 **提示：** 本課落實「人負責決策驗收，AI 負責寫程式」——除了第一格載入資料外，筆記本無須預留程式碼，所有統計與繪圖均交由 AI 自行撰寫執行。
 
 
 [下一步：AI 協作資料分析實戰範例](../AI協作資料分析_12個範例/README.md)　·　[回到學習地圖](../README.md)
