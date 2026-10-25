@@ -1125,7 +1125,7 @@
         badgeClass: "pill-purple",
         conditions: ["continuous-single", "large-sample"],
         conditionText: "單一連續數值、大量樣本，看集中峰值",
-        caveat: "<strong>柱子相連代表連續區間 (Bin)</strong>！切勿與長條圖（獨立離散類別）搞混。",
+        caveat: "<strong>柱子相連代表連續區間 (Bin)</strong>！搭配「平均數與標準差 (σ)」評估數據集中或分散，切勿與長條圖搞混。",
         pythonCode: "sns.histplot(df['薪資'], bins=20, kde=True)",
         svgGenerator: () => `
           <svg viewBox="0 0 320 150">
@@ -1159,7 +1159,7 @@
         badgeClass: "pill-purple",
         conditions: ["five-number", "detect-outliers"],
         conditionText: "檢視 5 數概括與揪出極端異常值 (Outliers)",
-        caveat: "一眼看穿平均數是否被少數極端暴增值拉偏，老闆質疑平均值時的唯一救星。",
+        caveat: "核心骨架為<strong>中位數與四分位距 (IQR = Q3 - Q1)</strong>，超出 1.5 倍 IQR 的離群值一覽無遺，防範平均數被極端暴增值拉偏。",
         pythonCode: "sns.boxplot(data=df, x='部門', y='薪資')",
         svgGenerator: () => `
           <svg viewBox="0 0 320 150">
