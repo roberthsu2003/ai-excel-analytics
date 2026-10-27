@@ -46,39 +46,43 @@ AI 很會寫程式，但它不知道你的資料哪裡有陷阱，也不會主�
 
 每一例**只多學一件新事情**，其他都是前面學過的。不必一次全部做完，照順序往下走就好。
 
+> 💡 **課堂教學與實作建議**：
+> - **推薦學習方式**：點擊 **「📖 GitHub 筆記本」** 作為對照參考，手動在自己的 Google Colab 開啟空白筆記本，跟著講師講解逐格複製、執行與觀察。這樣能深刻體會每行程式與統計洞察的關聯！
+> - **快速體驗方式**：點擊 **「💻 開啟 Colab」**，可直接在雲端載入範例並另存副本到個人雲端硬碟。
+
 ### 🟢 第一段：熟悉流程（01～02）
 
-| 範例 | 官方範例問題 | 這一例多學的一件事 |
-| :---: | :--- | :--- |
-| [01 班級段考成績](./01_class_scores/README.md) | 哪一科平均最低？ | 走一次完整三階提問；**缺考不是 0 分** |
-| [02 便利商店銷售](./02_store_sales/README.md) | 哪一類商品整週賺最多？ | 表格裡沒有「營收」欄，要自己算出來（單價 × 數量）；**賣最多件 ≠ 賺最多錢** |
+| 範例說明書 | 官方範例問題 | 這一例多學的一件事 | 實作筆記本 |
+| :--- | :--- | :--- | :--- |
+| [01 班級段考成績](./01_class_scores/README.md) | 哪一科平均最低？ | 走一次完整三階提問；**缺考不是 0 分** | [📖 GitHub 筆記本](./01_class_scores/lesson.ipynb)<br>[💻 開啟 Colab](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/03_AI%E5%8D%94%E4%BD%9C%E8%B3%87%E6%96%99%E5%88%86%E6%9E%90/01_class_scores/lesson.ipynb) |
+| [02 便利商店銷售](./02_store_sales/README.md) | 哪一類商品整週賺最多？ | 表格裡沒有「營收」欄，要自己算出來（單價 × 數量）；**賣最多件 ≠ 賺最多錢** | [📖 GitHub 筆記本](./02_store_sales/lesson.ipynb)<br>[💻 開啟 Colab](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/03_AI%E5%8D%94%E4%BD%9C%E8%B3%87%E6%96%99%E5%88%86%E6%9E%90/02_store_sales/lesson.ipynb) |
 
 ### 🔵 第二段：把亂資料整理乾淨（03～06）
 
-| 範例 | 官方範例問題 | 這一例多學的一件事 |
-| :---: | :--- | :--- |
-| [03 圖書館借閱](./03_library_files/README.md) | 哪一類書最常被借？ | 資料分在三種檔案裡，要先**讀對檔案**；用代碼對照表查出分類名稱 |
-| [04 社區活動問卷](./04_survey_cleaning/README.md) | 滿意度 1～5 分各有幾人？ | 刪除重複問卷、統一「5分／非常滿意」這類寫法，並**記錄改了哪些資料** |
-| [05 連鎖書店季報](./05_bookstore_merge/README.md) | 哪家門市營收最高？ | 把三個月的訂單接起來、對應門市和商品；**找出對不上的資料**，別讓營收悄悄變少 |
-| [06 縣市用電](./06_power_reshape/README.md) | 臺北市 24 個月用電怎麼變化？ | 月份排在 24 個欄位裡無法畫趨勢，要先**把表格轉個方向（逆透視轉長表）** |
+| 範例說明書 | 官方範例問題 | 這一例多學的一件事 | 實作筆記本 |
+| :--- | :--- | :--- | :--- |
+| [03 圖書館借閱](./03_library_files/README.md) | 哪一類書最常被借？ | 資料分在三種檔案裡，要先**讀對檔案**；用代碼對照表查出分類名稱 | [📖 GitHub 筆記本](./03_library_files/lesson.ipynb)<br>[💻 開啟 Colab](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/03_AI%E5%8D%94%E4%BD%9C%E8%B3%87%E6%96%99%E5%88%86%E6%9E%90/03_library_files/lesson.ipynb) |
+| [04 社區活動問卷](./04_survey_cleaning/README.md) | 滿意度 1～5 分各有幾人？ | 刪除重複問卷、統一「5分／非常滿意」這類寫法，並**記錄改了哪些資料** | [📖 GitHub 筆記本](./04_survey_cleaning/lesson.ipynb)<br>[💻 開啟 Colab](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/03_AI%E5%8D%94%E4%BD%9C%E8%B3%87%E6%96%99%E5%88%86%E6%9E%90/04_survey_cleaning/lesson.ipynb) |
+| [05 連鎖書店季報](./05_bookstore_merge/README.md) | 哪家門市營收最高？ | 把三個月的訂單接起來、對應門市和商品；**找出對不上的資料**，別讓營收悄悄變少 | [📖 GitHub 筆記本](./05_bookstore_merge/lesson.ipynb)<br>[💻 開啟 Colab](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/03_AI%E5%8D%94%E4%BD%9C%E8%B3%87%E6%96%99%E5%88%86%E6%9E%90/05_bookstore_merge/lesson.ipynb) |
+| [06 縣市用電](./06_power_reshape/README.md) | 臺北市 24 個月用電怎麼變化？ | 月份排在 24 個欄位裡無法畫趨勢，要先**把表格轉個方向（逆透視轉長表）** | [📖 GitHub 筆記本](./06_power_reshape/lesson.ipynb)<br>[💻 開啟 Colab](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/03_AI%E5%8D%94%E4%BD%9C%E8%B3%87%E6%96%99%E5%88%86%E6%9E%90/06_power_reshape/lesson.ipynb) |
 
 ### 🟡 第三段：數對東西、算對指標（07～11）
 
-| 範例 | 官方範例問題 | 這一例多學的一件事 |
-| :---: | :--- | :--- |
-| [07 健身房會員](./07_gym_groupby/README.md) | 哪家分店入場最多？ | 同一人會來很多次：**「人次」和「人數」是兩回事** |
-| [08 外送訂單](./08_delivery_time/README.md) | 一天中幾點訂單最多？ | 系統時間是國際標準時間，**比台灣慢 8 小時**，要先換算 |
-| [09 六城市氣象](./09_weather_charts/README.md) | 臺北一年的氣溫怎麼變化？ | 同一份資料，**問題不同就換不同的圖**；單位不同的數字不放在同一個軸 |
-| [10 台北租屋](./10_rent_seaborn/README.md) | 每坪租金大多落在哪裡？ | 找出「月租 1 元」這種**打錯的資料**；用「每坪租金」才能公平比較大小不同的房子 |
-| [11 業務週報](./11_sales_kpi_style/README.md) | 哪一組業績達成率最高？ | 比率要先說清楚**分子和分母**；報表加上千分位和百分比 |
+| 範例說明書 | 官方範例問題 | 這一例多學的一件事 | 實作筆記本 |
+| :--- | :--- | :--- | :--- |
+| [07 健身房會員](./07_gym_groupby/README.md) | 哪家分店入場最多？ | 同一人會來很多次：**「人次」和「人數」是兩回事** | [📖 GitHub 筆記本](./07_gym_groupby/lesson.ipynb)<br>[💻 開啟 Colab](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/03_AI%E5%8D%94%E4%BD%9C%E8%B3%87%E6%96%99%E5%88%86%E6%9E%90/07_gym_groupby/lesson.ipynb) |
+| [08 外送訂單](./08_delivery_time/README.md) | 一天中幾點訂單最多？ | 系統時間是國際標準時間，**比台灣慢 8 小時**，要先換算 | [📖 GitHub 筆記本](./08_delivery_time/lesson.ipynb)<br>[💻 開啟 Colab](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/03_AI%E5%8D%94%E4%BD%9C%E8%B3%87%E6%96%99%E5%88%86%E6%9E%90/08_delivery_time/lesson.ipynb) |
+| [09 六城市氣象](./09_weather_charts/README.md) | 臺北一年的氣溫怎麼變化？ | 同一份資料，**問題不同就換不同的圖**；單位不同的數字不放在同一個軸 | [📖 GitHub 筆記本](./09_weather_charts/lesson.ipynb)<br>[💻 開啟 Colab](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/03_AI%E5%8D%94%E4%BD%9C%E8%B3%87%E6%96%99%E5%88%86%E6%9E%90/09_weather_charts/lesson.ipynb) |
+| [10 台北租屋](./10_rent_seaborn/README.md) | 每坪租金大多落在哪裡？ | 找出「月租 1 元」這種**打錯的資料**；用「每坪租金」才能公平比較大小不同的房子 | [📖 GitHub 筆記本](./10_rent_seaborn/lesson.ipynb)<br>[💻 開啟 Colab](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/03_AI%E5%8D%94%E4%BD%9C%E8%B3%87%E6%96%99%E5%88%86%E6%9E%90/10_rent_seaborn/lesson.ipynb) |
+| [11 業務週報](./11_sales_kpi_style/README.md) | 哪一組業績達成率最高？ | 比率要先說清楚**分子和分母**；報表加上千分位和百分比 | [📖 GitHub 筆記本](./11_sales_kpi_style/lesson.ipynb)<br>[💻 開啟 Colab](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/03_AI%E5%8D%94%E4%BD%9C%E8%B3%87%E6%96%99%E5%88%86%E6%9E%90/11_sales_kpi_style/lesson.ipynb) |
 
 ### 🔴 第四段：自己來（12～14）
 
-| 範例 | 官方範例問題 | 這一例多學的一件事 |
-| :---: | :--- | :--- |
-| [12 共享單車（總整專題）](./12_bike_capstone/README.md) | 一天中幾點借車最多？最後換你出題 | 綜合前面所有技巧；**同一筆有問題的資料，有的問題要排除、有的問題可以保留** |
-| [13 辦公室資料](./13_office_chart_basics/README.md) | 各部門一年花多少錢？ | 回到前一章的辦公室資料，**比較、組成、分布、關係、趨勢**五種問題各做一張圖 |
-| [14 法務部公開統計](./14_moj_public_data/README.md) | 由你選的官方資料決定 | 使用**真實的政府開放資料**：自己記錄來源、把民國年換成西元、注意最新年度還沒結束 |
+| 範例說明書 | 官方範例問題 | 這一例多學的一件事 | 實作筆記本 |
+| :--- | :--- | :--- | :--- |
+| [12 共享單車（總整專題）](./12_bike_capstone/README.md) | 一天中幾點借車最多？最後換你出題 | 綜合前面所有技巧；**同一筆有問題的資料，有的問題要排除、有的問題可以保留** | [📖 GitHub 筆記本](./12_bike_capstone/lesson.ipynb)<br>[💻 開啟 Colab](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/03_AI%E5%8D%94%E4%BD%9C%E8%B3%87%E6%96%99%E5%88%86%E6%9E%90/12_bike_capstone/lesson.ipynb) |
+| [13 辦公室資料](./13_office_chart_basics/README.md) | 各部門一年花多少錢？ | 回到前一章的辦公室資料，**比較、組成、分布、關係、趨勢**五種問題各做一張圖 | [📖 GitHub 筆記本](./13_office_chart_basics/lesson.ipynb)<br>[💻 開啟 Colab](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/03_AI%E5%8D%94%E4%BD%9C%E8%B3%87%E6%96%99%E5%88%86%E6%9E%90/13_office_chart_basics/lesson.ipynb) |
+| [14 法務部公開統計](./14_moj_public_data/README.md) | 由你選的官方資料決定 | 使用**真實的政府開放資料**：自己記錄來源、把民國年換成西元、注意最新年度還沒結束 | [📖 GitHub 筆記本](./14_moj_public_data/lesson.ipynb)<br>[💻 開啟 Colab](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/03_AI%E5%8D%94%E4%BD%9C%E8%B3%87%E6%96%99%E5%88%86%E6%9E%90/14_moj_public_data/lesson.ipynb) |
 
 ---
 
@@ -86,7 +90,7 @@ AI 很會寫程式，但它不知道你的資料哪裡有陷阱，也不會主�
 
 學生完全不需要手寫程式碼，所有程式碼都由 AI 根據提問即時生成：
 
-1. 打開範例的 `README.md`，點上方的 **Open in Colab** 按鈕。
+1. 打開範例的 `README.md`，點上方的 **Open in Colab** 按鈕（或表格中的「開啟 Colab」）。
 2. 在 Colab 執行**第 0 步**儲存格（點左邊的 ▶），它會自動下載資料並配置繁體中文字型。
 3. 依序複製**第一階 ➔ 第二階（步驟 2-1、2-2） ➔ 第三階** 的 Prompt 貼給 Colab 側邊的 Gemini AI。
 4. **自主探索**：第一階 AI 會拋出 5 個問題，你可以挑選自己感興趣的問題進行探索；也可以重複第 2 階與第 3 階多次！

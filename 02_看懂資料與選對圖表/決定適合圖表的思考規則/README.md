@@ -85,10 +85,10 @@ graph TD
 [![比較圖表選用](../圖解/%E9%81%B8%E5%9C%96%E7%9F%A9%E9%99%A3_%E6%AF%94%E8%BC%83.svg)](../圖解/%E9%81%B8%E5%9C%96%E7%9F%A9%E9%99%A3_%E6%AF%94%E8%BC%83.svg)
 
 - **垂直長條圖 (Column Chart)**（[📖 檢視 GitHub 筆記本](./Colab範例/01_垂直長條圖.ipynb) · [💻 開啟 Colab 範例](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/02_%E7%9C%8B%E6%87%82%E8%B3%87%E6%96%99%E8%88%87%E9%81%B8%E5%B0%8D%E5%9C%96%E8%A1%A8/%E6%B1%BA%E5%AE%9A%E9%81%A9%E5%90%88%E5%9C%96%E8%A1%A8%E7%9A%84%E6%80%9D%E8%80%83%E8%A6%8F%E5%89%87/Colab%E7%AF%84%E4%BE%8B/01_%E5%9E%82%E7%9B%B4%E9%95%B7%E6%A2%9D%E5%9C%96.ipynb)）：
-  - **適用條件**：類別數量少（$\le 6$ 個）且標籤簡短。
+  - **適用條件**：類別數量少（≤ 6 個）且標籤簡短。
   - **防呆底線**：**Y 軸絕對要從 0 開始**，不可截斷基準線！
 - **水平長條圖 (Bar Chart)**（[📖 檢視 GitHub 筆記本](./Colab範例/02_水平長條圖.ipynb) · [💻 開啟 Colab 範例](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/02_%E7%9C%8B%E6%87%82%E8%B3%87%E6%96%99%E8%88%87%E9%81%B8%E5%B0%8D%E5%9C%96%E8%A1%A8/%E6%B1%BA%E5%AE%9A%E9%81%A9%E5%90%88%E5%9C%96%E8%A1%A8%E7%9A%84%E6%80%9D%E8%80%83%E8%A6%8F%E5%89%87/Colab%E7%AF%84%E4%BE%8B/02_%E6%B0%B4%E5%B9%B3%E9%95%B7%E6%A2%9D%E5%9C%96.ipynb)）：
-  - **適用條件**：類別數量多（$\ge 7$ 個）或項目名稱較長（如「智慧型手機零件採購部」）。
+  - **適用條件**：類別數量多（≥ 7 個）或項目名稱較長（如「智慧型手機零件採購部」）。
   - **優點**：文字水平排列，閱讀最自然；請**務必由大到小排序**。
 - **分組長條圖 (Grouped Bar)**（[📖 檢視 GitHub 筆記本](./Colab範例/03_分組長條圖.ipynb) · [💻 開啟 Colab 範例](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/02_%E7%9C%8B%E6%87%82%E8%B3%87%E6%96%99%E8%88%87%E9%81%B8%E5%B0%8D%E5%9C%96%E8%A1%A8/%E6%B1%BA%E5%AE%9A%E9%81%A9%E5%90%88%E5%9C%96%E8%A1%A8%E7%9A%84%E6%80%9D%E8%80%83%E8%A6%8F%E5%89%87/Colab%E7%AF%84%E4%BE%8B/03_%E5%88%86%E7%B5%84%E9%95%B7%E6%A2%9D%E5%9C%96.ipynb)）：
   - **適用條件**：同一個類別內同時比對 2 個指標（例如「預算 vs 實際」或「今年 vs 去年」）。
@@ -106,7 +106,7 @@ graph TD
 - **百分比長條圖 (100% Stacked Bar)**（[📖 檢視 GitHub 筆記本](./Colab範例/05_百分比長條圖.ipynb) · [💻 開啟 Colab 範例](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/02_%E7%9C%8B%E6%87%82%E8%B3%87%E6%96%99%E8%88%87%E9%81%B8%E5%B0%8D%E5%9C%96%E8%A1%A8/%E6%B1%BA%E5%AE%9A%E9%81%A9%E5%90%88%E5%9C%96%E8%A1%A8%E7%9A%84%E6%80%9D%E8%80%83%E8%A6%8F%E5%89%87/Colab%E7%AF%84%E4%BE%8B/05_%E7%99%BE%E5%88%86%E6%AF%94%E9%95%B7%E6%A2%9D%E5%9C%96.ipynb)）：
   - **首選推薦！** 比圓餅圖更容易讓眼睛精準比對長度差距，不管單一總體或跨群組比較結構都非常清晰。
 - **甜甜圈圖 / 圓餅圖 (Donut / Pie Chart)**（[📖 檢視 GitHub 筆記本](./Colab範例/06_甜甜圈圖與圓餅圖.ipynb) · [💻 開啟 Colab 範例](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/02_%E7%9C%8B%E6%87%82%E8%B3%87%E6%96%99%E8%88%87%E9%81%B8%E5%B0%8D%E5%9C%96%E8%A1%A8/%E6%B1%BA%E5%AE%9A%E9%81%A9%E5%90%88%E5%9C%96%E8%A1%A8%E7%9A%84%E6%80%9D%E8%80%83%E8%A6%8F%E5%89%87/Colab%E7%AF%84%E4%BE%8B/06_%E7%94%9C%E7%94%9C%E5%9C%88%E5%9C%96%E8%88%87%E5%9C%93%E9%A4%85%E5%9C%96.ipynb)）：
-  - **限制條件**：**僅限於類別極少（$\le 4$ 個）**且想強調某個主導份額（例如「線上訂單已超過半數」）。
+  - **限制條件**：**僅限於類別極少（≤ 4 個）**且想強調某個主導份額（例如「線上訂單已超過半數」）。
   - **禁忌**：切勿切成 5 塊以上的細碎披薩，嚴禁使用 3D 傾斜視角。
 - **堆疊長條圖 (Stacked Bar Chart)**（[📖 檢視 GitHub 筆記本](./Colab範例/07_堆疊長條圖.ipynb) · [💻 開啟 Colab 範例](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/02_%E7%9C%8B%E6%87%82%E8%B3%87%E6%96%99%E8%88%87%E9%81%B8%E5%B0%8D%E5%9C%96%E8%A1%A8/%E6%B1%BA%E5%AE%9A%E9%81%A9%E5%90%88%E5%9C%96%E8%A1%A8%E7%9A%84%E6%80%9D%E8%80%83%E8%A6%8F%E5%89%87/Colab%E7%AF%84%E4%BE%8B/07_%E5%A0%86%E7%96%8A%E9%95%B7%E6%A2%9D%E5%9C%96.ipynb)）：
   - **適用條件**：需要同時掌握「各類別總額」與「內部各成分份額」的情境（注意：除最底層外，上方色塊基準線浮動，較難精確比較高低）。
@@ -122,10 +122,10 @@ graph TD
 - **直方圖 (Histogram)**（[📖 檢視 GitHub 筆記本](./Colab範例/08_直方圖.ipynb) · [💻 開啟 Colab 範例](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/02_%E7%9C%8B%E6%87%82%E8%B3%87%E6%96%99%E8%88%87%E9%81%B8%E5%B0%8D%E5%9C%96%E8%A1%A8/%E6%B1%BA%E5%AE%9A%E9%81%A9%E5%90%88%E5%9C%96%E8%A1%A8%E7%9A%84%E6%80%9D%E8%80%83%E8%A6%8F%E5%89%87/Colab%E7%AF%84%E4%BE%8B/08_%E7%9B%B4%E6%96%B9%E5%9C%96.ipynb)）：
   - **適用條件**：單一連續數值（如大量訂單配送時間、薪資），觀察波峰集中位置、偏態走向與常態分佈。
   - **關鍵**：柱子與柱子之間是緊密相連的（代表連續區間 Bin），切勿與類別長條圖搞混。
-  - **統計尺規**：搭配**平均數與標準差 ($\sigma$)**，標準差越小代表數值越集中在平均值附近，標準差越大代表個體差異懸殊。
+  - **統計尺規**：搭配**平均數與標準差 (σ)**，標準差越小代表數值越集中在平均值附近，標準差越大代表個體差異懸殊。
 - **箱形圖 / 盒鬚圖 (Box Plot)**（[📖 檢視 GitHub 筆記本](./Colab範例/09_箱形圖.ipynb) · [💻 開啟 Colab 範例](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/02_%E7%9C%8B%E6%87%82%E8%B3%87%E6%96%99%E8%88%87%E9%81%B8%E5%B0%8D%E5%9C%96%E8%A1%A8/%E6%B1%BA%E5%AE%9A%E9%81%A9%E5%90%88%E5%9C%96%E8%A1%A8%E7%9A%84%E6%80%9D%E8%80%83%E8%A6%8F%E5%89%87/Colab%E7%AF%84%E4%BE%8B/09_%E7%AE%B1%E5%BD%A2%E5%9C%96.ipynb)）：
   - **適用條件**：檢視數據 5 數概括（最小值、Q1、中位數、Q3、最大值）與抓出極端離群值 (Outliers) 的最強工具。
-  - **統計尺規**：核心骨架為**中位數（Q2）**與**四分位距（IQR = Q3 - Q1）**。箱體高度代表中間 50% 核心資料的跨度，超出 $1.5 \times \text{IQR}$ 的點即為**離群異常值**。
+  - **統計尺規**：核心骨架為**中位數（Q2）**與**四分位距（IQR = Q3 - Q1）**。箱體高度代表中間 50% 核心資料的跨度，超出 1.5 × IQR 的點即為**離群異常值**。
   - **商業價值**：一眼看穿「平均數是否被少數極端高薪或特殊棘手個案拉偏」，並能跨組橫向比較各團隊處理流程的穩定度。
 
 ---
@@ -153,7 +153,7 @@ graph TD
 [![趨勢圖表選用](../圖解/%E9%81%B8%E5%9C%96%E7%9F%A9%E9%99%A3_%E8%B6%A8%E5%8B%A2.svg)](../圖解/%E9%81%B8%E5%9C%96%E7%9F%A9%E9%99%A3_%E8%B6%A8%E5%8B%A2.svg)
 
 - **折線圖 (Line Chart)**（[📖 檢視 GitHub 筆記本](./Colab範例/13_折線圖.ipynb) · [💻 開啟 Colab 範例](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/02_%E7%9C%8B%E6%87%82%E8%B3%87%E6%96%99%E8%88%87%E9%81%B8%E5%B0%8D%E5%9C%96%E8%A1%A8/%E6%B1%BA%E5%AE%9A%E9%81%A9%E5%90%88%E5%9C%96%E8%A1%A8%E7%9A%84%E6%80%9D%E8%80%83%E8%A6%8F%E5%89%87/Colab%E7%AF%84%E4%BE%8B/13_%E6%8A%98%E7%B7%9A%E5%9C%96.ipynb)）：
-  - **適用條件**：時間序列較長（$> 5$ 個時間點，例如每月、每日），透過斜率展示走勢變化。
+  - **適用條件**：時間序列較長（> 5 個時間點，例如每月、每日），透過斜率展示走勢變化。
   - **防呆底線**：**X 軸必須是時間型態且嚴格由左至右遞增，非時間類別嚴禁連線**。
 - **時間長條圖 (Time-series Bar)**（[📖 檢視 GitHub 筆記本](./Colab範例/14_時間長條圖.ipynb) · [💻 開啟 Colab 範例](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/02_%E7%9C%8B%E6%87%82%E8%B3%87%E6%96%99%E8%88%87%E9%81%B8%E5%B0%8D%E5%9C%96%E8%A1%A8/%E6%B1%BA%E5%AE%9A%E9%81%A9%E5%90%88%E5%9C%96%E8%A1%A8%E7%9A%84%E6%80%9D%E8%80%83%E8%A6%8F%E5%89%87/Colab%E7%AF%84%E4%BE%8B/14_%E6%99%82%E9%96%93%E9%95%B7%E6%A2%9D%E5%9C%96.ipynb)）：
   - **適用條件**：時間點極少時（例如僅有 3~4 個季度或年份），用長條圖比折線圖更加穩重大方。

@@ -12,15 +12,19 @@
 
 | 順序 | 資料情境與範例問題 | 資料特性與邊界 | 筆記本與資料 |
 | :---: | :--- | :--- | :--- |
-| **01** | 社區服務案件：哪個服務類別處理較久？ | 8 個長名稱類別，處理中案件排除（未結案無時數） | [在 Colab 開啟](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/02_%E7%9C%8B%E6%87%82%E8%B3%87%E6%96%99%E8%88%87%E9%81%B8%E5%B0%8D%E5%9C%96%E8%A1%A8/%E5%92%8CAI%E5%8D%94%E4%BD%9C%E7%9A%84%E4%B8%89%E9%9A%8E%E6%8F%90%E5%95%8F%E6%B3%95/01_%E7%A4%BE%E5%8D%80%E6%9C%8D%E5%8B%99%E6%A1%88%E4%BB%B6.ipynb) · [xlsx](./資料集/社區服務案件.xlsx) |
-| **02** | 單車租借月報：每月次數如何變化？ | 12 個月時間數列，月總計無逐日細節（不把雨天當唯一因果） | [在 Colab 開啟](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/02_%E7%9C%8B%E6%87%82%E8%B3%87%E6%96%99%E8%88%87%E9%81%B8%E5%B0%8D%E5%9C%96%E8%A1%A8/%E5%92%8CAI%E5%8D%94%E4%BD%9C%E7%9A%84%E4%B8%89%E9%9A%8E%E6%8F%90%E5%95%8F%E6%B3%95/02_%E5%96%AE%E8%BB%8A%E7%A7%9F%E5%80%9F%E6%9C%88%E5%A0%B1.ipynb) · [xlsx](./資料集/單車租借月報.xlsx) |
-| **03** | 閱讀時間與測驗：兩個數值有關嗎？ | 64 位學生連續數值，部分缺分數（相關不等於因果） | [在 Colab 開啟](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/02_%E7%9C%8B%E6%87%82%E8%B3%87%E6%96%99%E8%88%87%E9%81%B8%E5%B0%8D%E5%9C%96%E8%A1%A8/%E5%92%8CAI%E5%8D%94%E4%BD%9C%E7%9A%84%E4%B8%89%E9%9A%8E%E6%8F%90%E5%95%8F%E6%B3%95/03_%E9%96%B1%E8%AE%80%E6%99%82%E9%96%93%E8%88%87%E6%B8%AC%E9%A9%97.ipynb) · [xlsx](./資料集/閱讀時間與測驗.xlsx) |
+| **01** | 社區服務案件：哪個服務類別處理較久？ | 8 個長名稱類別，處理中案件排除（未結案無時數） | [📖 檢視 GitHub 筆記本](./01_社區服務案件.ipynb) · [💻 在 Colab 開啟](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/02_%E7%9C%8B%E6%87%82%E8%B3%87%E6%96%99%E8%88%87%E9%81%B8%E5%B0%8D%E5%9C%96%E8%A1%A8/%E5%92%8CAI%E5%8D%94%E4%BD%9C%E7%9A%84%E4%B8%89%E9%9A%8E%E6%8F%90%E5%95%8F%E6%B3%95/01_%E7%A4%BE%E5%8D%80%E6%9C%8D%E5%8B%99%E6%A1%88%E4%BB%B6.ipynb) · [xlsx](./資料集/社區服務案件.xlsx) |
+| **02** | 單車租借月報：每月次數如何變化？ | 12 個月時間數列，月總計無逐日細節（不把雨天當唯一因果） | [📖 檢視 GitHub 筆記本](./02_單車租借月報.ipynb) · [💻 在 Colab 開啟](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/02_%E7%9C%8B%E6%87%82%E8%B3%87%E6%96%99%E8%88%87%E9%81%B8%E5%B0%8D%E5%9C%96%E8%A1%A8/%E5%92%8CAI%E5%8D%94%E4%BD%9C%E7%9A%84%E4%B8%89%E9%9A%8E%E6%8F%90%E5%95%8F%E6%B3%95/02_%E5%96%AE%E8%BB%8A%E7%A7%9F%E5%80%9F%E6%9C%88%E5%A0%B1.ipynb) · [xlsx](./資料集/單車租借月報.xlsx) |
+| **03** | 閱讀時間與測驗：兩個數值有關嗎？ | 64 位學生連續數值，部分缺分數（相關不等於因果） | [📖 檢視 GitHub 筆記本](./03_閱讀時間與測驗.ipynb) · [💻 在 Colab 開啟](https://colab.research.google.com/github/roberthsu2003/ai-excel-analytics/blob/main/02_%E7%9C%8B%E6%87%82%E8%B3%87%E6%96%99%E8%88%87%E9%81%B8%E5%B0%8D%E5%9C%96%E8%A1%A8/%E5%92%8CAI%E5%8D%94%E4%BD%9C%E7%9A%84%E4%B8%89%E9%9A%8E%E6%8F%90%E5%95%8F%E6%B3%95/03_%E9%96%B1%E8%AE%80%E6%99%82%E9%96%93%E8%88%87%E6%B8%AC%E9%A9%97.ipynb) · [xlsx](./資料集/閱讀時間與測驗.xlsx) |
 
-每本筆記本第一格也有 **「在 Colab 開啟」** 按鈕。[三份資料的欄位與使用邊界](./資料集/DATA_CARD.md) 可供教師備課和學生驗收。
+每本筆記本第一格也提供 **「在 Colab 開啟」** 按鈕。[三份資料的欄位與使用邊界](./資料集/DATA_CARD.md) 可供教師備課和學生驗收。
 
 ### 操作使用方式
 
-1. 點表格中的「在 Colab 開啟」，執行第 **0** 格；它會讀取相應的 xlsx，並沿用前面章節的 `mplfonts`／`Noto Sans CJK SC` 繁體中文字型設定。
+> 💡 **課堂教學與實作建議**：
+> - **推薦學習方式**：點擊 **「📖 檢視 GitHub 筆記本」** 作為對照參考，手動在自己的 Google Colab 開啟空白筆記本，跟著講師講解逐格複製、執行與觀察。這樣能深刻體會每行程式與統計洞察的關聯！
+> - **快速體驗方式**：點擊 **「💻 在 Colab 開啟」**，可直接在雲端載入範例並另存副本到個人雲端硬碟。
+
+1. 執行第 **0** 格；它會讀取相應的 xlsx，並沿用前面章節的 `mplfonts`／`Noto Sans CJK SC` 繁體中文字型設定。
 2. 將 **① 第一階 Prompt** 貼給 Colab Gemini，由 AI 寫程式顯示前 5 列、檢查缺值並提出 5 個可分析的問題。
 3. 進入 **② 第二階**，將選定的問題貼給 AI 請它建議圖表並分析優缺點；決定圖表後請 AI 執行運算並只畫一張圖。
 4. 留在同一段對話貼上 **③ 第三階 Prompt**，請 AI 透過數據與圖表解釋結論、洞察與限制。可挑選其他問題重複第二、三階練習！
