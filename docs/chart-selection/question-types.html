@@ -783,6 +783,59 @@
                 </g>
               </svg>
             `
+          },
+          {
+            name: "堆疊長條圖",
+            caption: "堆疊長條圖：同時掌握「各類別總額」與「內部各成分份額」",
+            when: "需要比對多個類別的總量高低，並同時觀察內部各子項目的組成貢獻。",
+            warn: "注意浮動基準線！除最底層外，上方色塊起點不一，難以精確比較中間層的長度差距。",
+            code: "df.plot(kind='bar', stacked=True)",
+            svg: () => `
+              <svg viewBox="0 0 420 230" xmlns="http://www.w3.org/2000/svg">
+                <line x1="50" y1="190" x2="380" y2="190" stroke="#94A3B8" stroke-width="1.5"/>
+                <!-- 圖例 -->
+                <rect x="230" y="15" width="12" height="10" fill="#EA580C" rx="2"/>
+                <text x="248" y="24" font-size="11" fill="#64748B">實體門市</text>
+                <rect x="315" y="15" width="12" height="10" fill="#FB923C" rx="2"/>
+                <text x="333" y="24" font-size="11" fill="#64748B">線上電商</text>
+
+                <!-- 組 1: 產品 A (總量 130 = 底 75 + 頂 55) -->
+                <rect x="80" y="190" width="48" height="0" rx="0" fill="#EA580C">
+                  <animate attributeName="height" from="0" to="75" dur="0.6s" begin="0.1s" fill="freeze"/>
+                  <animate attributeName="y" from="190" to="115" dur="0.6s" begin="0.1s" fill="freeze"/>
+                </rect>
+                <rect x="80" y="115" width="48" height="0" rx="3" fill="#FB923C">
+                  <animate attributeName="height" from="0" to="55" dur="0.6s" begin="0.3s" fill="freeze"/>
+                  <animate attributeName="y" from="115" to="60" dur="0.6s" begin="0.3s" fill="freeze"/>
+                </rect>
+                <text x="104" y="50" font-size="11" fill="#EA580C" font-weight="bold" text-anchor="middle">總額 130</text>
+                <text x="104" y="210" font-size="11" fill="#334155" text-anchor="middle" font-weight="bold">產品 A</text>
+
+                <!-- 組 2: 產品 B (總量 160 = 底 100 + 頂 60) -->
+                <rect x="180" y="190" width="48" height="0" rx="0" fill="#EA580C">
+                  <animate attributeName="height" from="0" to="100" dur="0.6s" begin="0.2s" fill="freeze"/>
+                  <animate attributeName="y" from="190" to="90" dur="0.6s" begin="0.2s" fill="freeze"/>
+                </rect>
+                <rect x="180" y="90" width="48" height="0" rx="3" fill="#FB923C">
+                  <animate attributeName="height" from="0" to="60" dur="0.6s" begin="0.4s" fill="freeze"/>
+                  <animate attributeName="y" from="90" to="30" dur="0.6s" begin="0.4s" fill="freeze"/>
+                </rect>
+                <text x="204" y="20" font-size="11" fill="#EA580C" font-weight="bold" text-anchor="middle">總額 160</text>
+                <text x="204" y="210" font-size="11" fill="#334155" text-anchor="middle" font-weight="bold">產品 B</text>
+
+                <!-- 組 3: 產品 C (總量 90 = 底 50 + 頂 40) -->
+                <rect x="280" y="190" width="48" height="0" rx="0" fill="#EA580C">
+                  <animate attributeName="height" from="0" to="50" dur="0.6s" begin="0.3s" fill="freeze"/>
+                  <animate attributeName="y" from="190" to="140" dur="0.6s" begin="0.3s" fill="freeze"/>
+                </rect>
+                <rect x="280" y="140" width="48" height="0" rx="3" fill="#FB923C">
+                  <animate attributeName="height" from="0" to="40" dur="0.6s" begin="0.5s" fill="freeze"/>
+                  <animate attributeName="y" from="140" to="100" dur="0.6s" begin="0.5s" fill="freeze"/>
+                </rect>
+                <text x="304" y="90" font-size="11" fill="#EA580C" font-weight="bold" text-anchor="middle">總額 90</text>
+                <text x="304" y="210" font-size="11" fill="#334155" text-anchor="middle" font-weight="bold">產品 C</text>
+              </svg>
+            `
           }
         ]
       },
@@ -946,6 +999,93 @@
                 <text x="210" y="210" font-size="11" fill="#059669" font-weight="bold" text-anchor="middle">圓形大小代表第 3 個數值指標（如利潤規模）</text>
               </svg>
             `
+          },
+          {
+            name: "相關係數熱力圖",
+            caption: "相關係數熱力圖：3 個以上連續變數時，全景掃描兩兩相關係數",
+            when: "擁有 3 個或更多連續數值指標時，以色彩矩陣全景檢驗兩兩變數間的關聯方向與強度。",
+            warn: "數值介於 -1 到 +1 之間；必須開啟數值註記 (annot=True)，避免單憑色差產生認知誤差。",
+            code: "sns.heatmap(df.corr(), annot=True, cmap='coolwarm', vmin=-1, vmax=1)",
+            svg: () => `
+              <svg viewBox="0 0 420 230" xmlns="http://www.w3.org/2000/svg">
+                <!-- 3x3 矩陣格 -->
+                <g transform="translate(100, 25)">
+                  <!-- Row 0: 年資 -->
+                  <rect x="0" y="0" width="55" height="42" fill="#047857" stroke="#FFF" stroke-width="2">
+                    <animate attributeName="opacity" from="0" to="1" dur="0.4s" begin="0.1s" fill="freeze"/>
+                  </rect>
+                  <text x="27" y="26" font-size="12" fill="#FFF" font-weight="bold" text-anchor="middle">1.00</text>
+
+                  <rect x="55" y="0" width="55" height="42" fill="#6EE7B7" stroke="#FFF" stroke-width="2">
+                    <animate attributeName="opacity" from="0" to="1" dur="0.4s" begin="0.2s" fill="freeze"/>
+                  </rect>
+                  <text x="82" y="26" font-size="12" fill="#064E3B" font-weight="bold" text-anchor="middle">0.45</text>
+
+                  <rect x="110" y="0" width="55" height="42" fill="#FCA5A5" stroke="#FFF" stroke-width="2">
+                    <animate attributeName="opacity" from="0" to="1" dur="0.4s" begin="0.3s" fill="freeze"/>
+                  </rect>
+                  <text x="137" y="26" font-size="12" fill="#7F1D1D" font-weight="bold" text-anchor="middle">-0.62</text>
+
+                  <!-- Row 1: 薪資 -->
+                  <rect x="0" y="42" width="55" height="42" fill="#6EE7B7" stroke="#FFF" stroke-width="2">
+                    <animate attributeName="opacity" from="0" to="1" dur="0.4s" begin="0.2s" fill="freeze"/>
+                  </rect>
+                  <text x="27" y="68" font-size="12" fill="#064E3B" font-weight="bold" text-anchor="middle">0.45</text>
+
+                  <rect x="55" y="42" width="55" height="42" fill="#047857" stroke="#FFF" stroke-width="2">
+                    <animate attributeName="opacity" from="0" to="1" dur="0.4s" begin="0.3s" fill="freeze"/>
+                  </rect>
+                  <text x="82" y="68" font-size="12" fill="#FFF" font-weight="bold" text-anchor="middle">1.00</text>
+
+                  <rect x="110" y="42" width="55" height="42" fill="#EF4444" stroke="#FFF" stroke-width="2">
+                    <animate attributeName="opacity" from="0" to="1" dur="0.4s" begin="0.4s" fill="freeze"/>
+                  </rect>
+                  <text x="137" y="68" font-size="12" fill="#FFF" font-weight="bold" text-anchor="middle">-0.81</text>
+
+                  <!-- Row 2: 離職率 -->
+                  <rect x="0" y="84" width="55" height="42" fill="#FCA5A5" stroke="#FFF" stroke-width="2">
+                    <animate attributeName="opacity" from="0" to="1" dur="0.4s" begin="0.3s" fill="freeze"/>
+                  </rect>
+                  <text x="27" y="110" font-size="12" fill="#7F1D1D" font-weight="bold" text-anchor="middle">-0.62</text>
+
+                  <rect x="55" y="84" width="55" height="42" fill="#EF4444" stroke="#FFF" stroke-width="2">
+                    <animate attributeName="opacity" from="0" to="1" dur="0.4s" begin="0.4s" fill="freeze"/>
+                  </rect>
+                  <text x="82" y="110" font-size="12" fill="#FFF" font-weight="bold" text-anchor="middle">-0.81</text>
+
+                  <rect x="110" y="84" width="55" height="42" fill="#047857" stroke="#FFF" stroke-width="2">
+                    <animate attributeName="opacity" from="0" to="1" dur="0.4s" begin="0.5s" fill="freeze"/>
+                  </rect>
+                  <text x="137" y="110" font-size="12" fill="#FFF" font-weight="bold" text-anchor="middle">1.00</text>
+
+                  <!-- 左側標籤 -->
+                  <text x="-12" y="26" font-size="12" fill="#334155" font-weight="bold" text-anchor="end">年資</text>
+                  <text x="-12" y="68" font-size="12" fill="#334155" font-weight="bold" text-anchor="end">薪資</text>
+                  <text x="-12" y="110" font-size="12" fill="#334155" font-weight="bold" text-anchor="end">離職率</text>
+
+                  <!-- 下方標籤 -->
+                  <text x="27" y="145" font-size="12" fill="#334155" font-weight="bold" text-anchor="middle">年資</text>
+                  <text x="82" y="145" font-size="12" fill="#334155" font-weight="bold" text-anchor="middle">薪資</text>
+                  <text x="137" y="145" font-size="12" fill="#334155" font-weight="bold" text-anchor="middle">離職率</text>
+                </g>
+
+                <!-- 色階尺規 Legend -->
+                <g transform="translate(295, 35)">
+                  <defs>
+                    <linearGradient id="heatGrad" x1="0" y1="1" x2="0" y2="0">
+                      <stop offset="0%" stop-color="#EF4444"/>
+                      <stop offset="50%" stop-color="#F8FAFC"/>
+                      <stop offset="100%" stop-color="#047857"/>
+                    </linearGradient>
+                  </defs>
+                  <rect x="0" y="0" width="14" height="110" rx="3" fill="url(#heatGrad)" stroke="#CBD5E1"/>
+                  <text x="22" y="12" font-size="10" fill="#047857" font-weight="bold">+1.0 強正相關</text>
+                  <text x="22" y="60" font-size="10" fill="#64748B" font-weight="bold">0.0 無關</text>
+                  <text x="22" y="108" font-size="10" fill="#EF4444" font-weight="bold">-1.0 強負相關</text>
+                </g>
+                <text x="210" y="205" font-size="11" fill="#059669" font-weight="bold" text-anchor="middle">以兩兩對稱矩陣，快速鎖定強關聯指標</text>
+              </svg>
+            `
           }
         ]
       },
@@ -1021,6 +1161,43 @@
                   <animate attributeName="y" from="190" to="40" dur="0.7s" begin="0.55s" fill="freeze"/>
                 </rect>
                 <text x="324" y="210" font-size="11" fill="#334155" text-anchor="middle" font-weight="bold">Q4</text>
+              </svg>
+            `
+          },
+          {
+            name: "堆疊面積圖",
+            caption: "堆疊面積圖：觀察多個類別隨時間演進的累積量總體趨勢",
+            when: "多個類別隨時間演進的累積量變化（建議類別 ≤ 3 個，例如門市與電商各月營收總和）。",
+            warn: "類別切忌過多，否則上方波浪層次起伏起伏，難以精確辨識中間層到底增長或衰退。",
+            code: "df.plot(kind='area', stacked=True, alpha=0.7)",
+            svg: () => `
+              <svg viewBox="0 0 420 230" xmlns="http://www.w3.org/2000/svg">
+                <line x1="50" y1="190" x2="380" y2="190" stroke="#94A3B8" stroke-width="1.5"/>
+                <line x1="50" y1="20" x2="50" y2="190" stroke="#CBD5E1" stroke-width="1"/>
+
+                <!-- 圖例 -->
+                <rect x="230" y="15" width="12" height="10" fill="#DC2626" rx="2"/>
+                <text x="248" y="24" font-size="11" fill="#64748B">實體門市</text>
+                <rect x="315" y="15" width="12" height="10" fill="#F87171" rx="2"/>
+                <text x="333" y="24" font-size="11" fill="#64748B">線上電商</text>
+
+                <!-- 底層面積 (門市) -->
+                <path d="M 60 190 L 60 140 Q 140 130 220 105 T 370 70 L 370 190 Z" fill="#DC2626" opacity="0.85">
+                  <animate attributeName="opacity" from="0" to="0.85" dur="0.8s" begin="0.1s" fill="freeze"/>
+                </path>
+
+                <!-- 頂層面積 (電商) 堆疊在上方 -->
+                <path d="M 60 140 Q 140 130 220 105 T 370 70 L 370 35 Q 290 55 220 65 T 60 95 Z" fill="#F87171" opacity="0.85">
+                  <animate attributeName="opacity" from="0" to="0.85" dur="0.8s" begin="0.3s" fill="freeze"/>
+                </path>
+
+                <text x="210" y="150" font-size="12" fill="#FFFFFF" font-weight="bold" text-anchor="middle">門市貢獻</text>
+                <text x="210" y="85" font-size="12" fill="#FFFFFF" font-weight="bold" text-anchor="middle">電商貢獻</text>
+
+                <text x="60" y="208" font-size="11" fill="#64748B" text-anchor="middle">Q1</text>
+                <text x="163" y="208" font-size="11" fill="#64748B" text-anchor="middle">Q2</text>
+                <text x="266" y="208" font-size="11" fill="#64748B" text-anchor="middle">Q3</text>
+                <text x="370" y="208" font-size="11" fill="#64748B" text-anchor="middle">Q4</text>
               </svg>
             `
           }
