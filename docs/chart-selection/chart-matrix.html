@@ -725,50 +725,11 @@
     <!-- 互動練習情境測驗 -->
     <section class="quiz-section">
       <div class="quiz-header">
-        <h2><span>🎯</span> 3 秒選圖情境快問快答</h2>
-        <p>測試你在真實職場中，能否一眼根據「資料特徵」挑中正確圖表：</p>
+        <h2><span>🎯</span> <span id="quizTitle">3 秒選圖情境快問快答</span></h2>
+        <p id="quizDesc">測試你在真實職場中，能否一眼根據「資料特徵」挑中正確圖表：</p>
       </div>
-      <div class="quiz-grid">
-        
-        <!-- 題目 1 -->
-        <div class="quiz-card" data-ans="b">
-          <div class="quiz-q">
-            <strong>情境 1：</strong> 手邊有 <strong>15 個產品分類</strong> 的今年營業額，且分類名稱很長（例如「智慧物聯網家庭安全套件」），該選哪種圖？
-          </div>
-          <div class="quiz-options">
-            <button class="quiz-btn" data-choice="a">A. 垂直長條圖（文字斜轉 45 度）</button>
-            <button class="quiz-btn" data-choice="b">B. 水平長條圖（由大到小排序）</button>
-            <button class="quiz-btn" data-choice="c">C. 圓餅圖（切成 15 塊）</button>
-          </div>
-          <div class="quiz-feedback"></div>
-        </div>
-
-        <!-- 題目 2 -->
-        <div class="quiz-card" data-ans="a">
-          <div class="quiz-q">
-            <strong>情境 2：</strong> 分析 <strong>400 位員工月薪</strong>，想找出中位數、確認是否有極端高薪主管拉偏平均，並標示離群值？
-          </div>
-          <div class="quiz-options">
-            <button class="quiz-btn" data-choice="a">A. 箱形圖 / 盒鬚圖 (Box Plot)</button>
-            <button class="quiz-btn" data-choice="b">B. 折線圖 (Line Chart)</button>
-            <button class="quiz-btn" data-choice="c">C. 甜甜圈圖 (Donut Chart)</button>
-          </div>
-          <div class="quiz-feedback"></div>
-        </div>
-
-        <!-- 題目 3 -->
-        <div class="quiz-card" data-ans="c">
-          <div class="quiz-q">
-            <strong>情境 3：</strong> 比較 <strong>2021、2022、2023</strong> 三個年份的總營收，只有 3 個時間點，用什麼圖最穩重？
-          </div>
-          <div class="quiz-options">
-            <button class="quiz-btn" data-choice="a">A. 折線圖（連成一條細線）</button>
-            <button class="quiz-btn" data-choice="b">B. 散佈圖（點三個點）</button>
-            <button class="quiz-btn" data-choice="c">C. 時間長條圖 (Time-series Bar)</button>
-          </div>
-          <div class="quiz-feedback"></div>
-        </div>
-
+      <div class="quiz-grid" id="quizGrid">
+        <!-- 由 JS 根據當前圖表類型動態注入測驗卡片 -->
       </div>
     </section>
 
@@ -1501,11 +1462,215 @@
     let currentCategory = "comp";
     let currentCondition = "all";
 
+    // 各圖表類別之職場情境快問快答題庫
+    const QUIZ_TITLES = {
+      all: "3 秒選圖情境快問快答（全 15 種圖表綜合挑戰）",
+      comp: "比較類 (Comparison) 選圖情境快問快答",
+      compst: "組成類 (Composition) 選圖情境快問快答",
+      dist: "分布類 (Distribution) 選圖情境快問快答",
+      rel: "關係類 (Relationship) 選圖情境快問快答",
+      trend: "趨勢類 (Trend) 選圖情境快問快答"
+    };
+
+    const QUIZ_DATA = {
+      all: [
+        {
+          q: "<strong>情境 1：</strong> 手邊有 <strong>15 個產品分類</strong> 的今年營業額，且分類名稱很長（例如「智慧物聯網家庭安全套件」），該選哪種圖？",
+          options: [
+            { key: "a", text: "A. 垂直長條圖（文字斜轉 45 度）" },
+            { key: "b", text: "B. 水平長條圖（由大到小排序）" },
+            { key: "c", text: "C. 圓餅圖（切成 15 塊）" }
+          ],
+          ans: "b",
+          explanation: "🎉 <strong>答對了！</strong> 項目多且文字長時，「水平長條圖」文字由左至右水平排列最好讀，千萬不要讓觀眾歪著脖子看斜字！"
+        },
+        {
+          q: "<strong>情境 2：</strong> 分析 <strong>400 位員工月薪</strong>，想找出中位數、確認是否有極端高薪主管拉偏平均，並標示離群值？",
+          options: [
+            { key: "a", text: "A. 箱形圖 / 盒鬚圖 (Box Plot)" },
+            { key: "b", text: "B. 折線圖 (Line Chart)" },
+            { key: "c", text: "C. 甜甜圈圖 (Donut Chart)" }
+          ],
+          ans: "a",
+          explanation: "🎉 <strong>答對了！</strong> 「箱形圖」包含 Q1、中位數、Q3 與 1.5×IQR 離群值，能一眼看穿極端薪資是否把平均拉高！"
+        },
+        {
+          q: "<strong>情境 3：</strong> 分析「<strong>廣告投放費</strong>」與「<strong>新用戶註冊數</strong>」兩個數值變數之間是否有正向關聯，該用什麼圖？",
+          options: [
+            { key: "a", text: "A. 折線圖（將各點連起來）" },
+            { key: "b", text: "B. 散佈圖 (Scatter Plot，點不連線)" },
+            { key: "c", text: "C. 100% 百分比長條圖" }
+          ],
+          ans: "b",
+          explanation: "🎉 <strong>答對了！</strong> 觀察兩連續變數關聯首選散佈圖，千萬不要用折線把點連起來（非時間序列嚴禁連線）！"
+        }
+      ],
+      comp: [
+        {
+          q: "<strong>情境 1：</strong> 手邊有 <strong>15 個產品分類</strong> 的今年營業額，且分類名稱很長（例如「智慧物聯網家庭安全套件」），該選哪種圖？",
+          options: [
+            { key: "a", text: "A. 垂直長條圖（文字斜轉 45 度）" },
+            { key: "b", text: "B. 水平長條圖（由大到小排序）" },
+            { key: "c", text: "C. 圓餅圖（切成 15 塊）" }
+          ],
+          ans: "b",
+          explanation: "🎉 <strong>答對了！</strong> 項目多且文字長時，「水平長條圖」文字由左至右水平排列最好讀，配合數值由大到小排序，排名立判！"
+        },
+        {
+          q: "<strong>情境 2：</strong> 主管想同時比對 4 個銷售部門在「<strong>今年度預算</strong>」與「<strong>實際花費</strong>」之間的達成差距，該挑哪種圖？",
+          options: [
+            { key: "a", text: "A. 垂直長條圖（只畫實際花費）" },
+            { key: "b", text: "B. 分組長條圖 (Grouped Bar Chart)" },
+            { key: "c", text: "C. 散佈圖 (Scatter Plot)" }
+          ],
+          ans: "b",
+          explanation: "🎉 <strong>答對了！</strong> 同一個類別內同時比對 2 個連續指標（預算 vs 實際、今年 vs 去年），並列呈現的「分組長條圖」是最佳首選！"
+        },
+        {
+          q: "<strong>情境 3：</strong> 要比較全台 <strong>25 家連鎖門市</strong> 的坪效，想精確突顯數值高低，但一般長條圖會形成大片厚重視覺色塊，該用什麼替代？",
+          options: [
+            { key: "a", text: "A. 點圖 / 棒棒糖圖 (Dot / Lollipop Plot)" },
+            { key: "b", text: "B. 堆疊面積圖" },
+            { key: "c", text: "C. 甜甜圈圖" }
+          ],
+          ans: "a",
+          explanation: "🎉 <strong>答對了！</strong> 項目極多（15～30 個）時，點圖或棒棒糖圖以細線與端點標記數值，能大幅減輕視覺墨水負擔，畫面乾淨清爽！"
+        }
+      ],
+      compst: [
+        {
+          q: "<strong>情境 1：</strong> 財務長想向董事會報告各部門「人事、差旅、業務耗材」各項花費占各部門總支出的百分比結構，並希望跨部門精準對比，哪種圖最專業？",
+          options: [
+            { key: "a", text: "A. 每個部門各畫一張圓餅圖" },
+            { key: "b", text: "B. 100% 百分比長條圖 (100% Stacked Bar)" },
+            { key: "c", text: "C. 3D 傾斜立體圓餅圖" }
+          ],
+          ans: "b",
+          explanation: "🎉 <strong>答對了！</strong> 人眼對「長度比對」的敏感度遠高於「角度與面積」！100% 百分比長條圖是商業分析跨組比例對比的絕對首選。"
+        },
+        {
+          q: "<strong>情境 2：</strong> 在電商月會簡報中，只想強力突顯「<strong>線上信用卡刷卡已強勢占據全店 75% 業績</strong>」，只有 2 種支付方式且份額懸殊，該選？",
+          options: [
+            { key: "a", text: "A. 甜甜圈圖 / 圓餅圖 (Donut / Pie Chart)" },
+            { key: "b", text: "B. 散佈圖" },
+            { key: "c", text: "C. 箱形圖" }
+          ],
+          ans: "a",
+          explanation: "🎉 <strong>答對了！</strong> 甜甜圈圖/圓餅圖僅限於「類別極少（≤ 4 個）」且想突顯某單一主導份額時使用，嚴禁細切成 5 塊以上的披薩碎塊。"
+        },
+        {
+          q: "<strong>情境 3：</strong> 需要在同一張圖中同時展示「<strong>各季度的總銷售額高低</strong>」以及「<strong>實體門市與電商官網各自貢獻了多少金額</strong>」，該選？",
+          options: [
+            { key: "a", text: "A. 堆疊長條圖 (Stacked Bar Chart)" },
+            { key: "b", text: "B. 100% 百分比長條圖" },
+            { key: "c", text: "C. 散佈圖" }
+          ],
+          ans: "a",
+          explanation: "🎉 <strong>答對了！</strong> 堆疊長條圖的總長度代表總營收，內部各色塊代表各成分貢獻，但需注意上方色塊基準線浮動難精準比對細節。"
+        }
+      ],
+      dist: [
+        {
+          q: "<strong>情境 1：</strong> 分析 <strong>400 位員工月薪</strong>，想找出真實典型水準（不受少數千萬年薪高層干擾），並標示出極端離群值 (Outliers)，該選？",
+          options: [
+            { key: "a", text: "A. 箱形圖 / 盒鬚圖 (Box Plot)" },
+            { key: "b", text: "B. 折線圖 (Line Chart)" },
+            { key: "c", text: "C. 甜甜圈圖 (Donut Chart)" }
+          ],
+          ans: "a",
+          explanation: "🎉 <strong>答對了！</strong> 箱形圖以中位數與四分位距 (IQR) 為骨架，超出 1.5×IQR 的點即為離群異常點，抗極端值干擾能力最強！"
+        },
+        {
+          q: "<strong>情境 2：</strong> 客服中心蒐集了 5,000 筆通話時長，想探查通話時間集中在哪個分鐘區間、是否呈常態分佈或有雙峰現象，該選？",
+          options: [
+            { key: "a", text: "A. 垂直長條圖（每筆通話畫一根柱子）" },
+            { key: "b", text: "B. 直方圖 (Histogram，切分成等寬 Bins)" },
+            { key: "c", text: "C. 圓餅圖" }
+          ],
+          ans: "b",
+          explanation: "🎉 <strong>答對了！</strong> 大量單一連續數值切分成連續區間（Bins），看出現頻率波峰，必須使用直方圖（柱子緊密相連代表連續區間）！"
+        },
+        {
+          q: "<strong>情境 3：</strong> 甲隊平均業績 100 萬（標準差 5 萬），乙隊平均也是 100 萬（標準差 40 萬），主管單看平均數以為兩隊一樣，分布圖表能看出什麼？",
+          options: [
+            { key: "a", text: "A. 完全看不出差異" },
+            { key: "b", text: "B. 甲隊數據高度集中在平均值附近；乙隊離散分散、個體差異懸殊" },
+            { key: "c", text: "C. 乙隊的團隊實力一定比甲隊強" }
+          ],
+          ans: "b",
+          explanation: "🎉 <strong>答對了！</strong> 標準差與 IQR 測量離散程度！標準差大代表表現波動劇烈、個體差異大，單看平均數會嚴重遮蔽營運風險。"
+        }
+      ],
+      rel: [
+        {
+          q: "<strong>情境 1：</strong> 分析師想探討「<strong>業務同仁每週拜訪客戶次數</strong>」與「<strong>本月成交金額</strong>」兩個數值變數之間是否有正向關聯，該用什麼圖？",
+          options: [
+            { key: "a", text: "A. 散佈圖 (Scatter Plot，點不連線)" },
+            { key: "b", text: "B. 折線圖（將每位業務的點用線連起來）" },
+            { key: "c", text: "C. 圓餅圖" }
+          ],
+          ans: "a",
+          explanation: "🎉 <strong>答對了！</strong> 兩個連續變數探討關聯首選散佈圖！千萬不要用折線把點連起來（因為 X 軸不是時間序列）。"
+        },
+        {
+          q: "<strong>情境 2：</strong> 在評估各產品表現時，想在同一張圖上同時呈現「<strong>廣告費 (X 軸)</strong>」、「<strong>營業額 (Y 軸)</strong>」，並用<strong>圓形面積代表「利潤規模」</strong>，該選？",
+          options: [
+            { key: "a", text: "A. 氣泡圖 (Bubble Chart)" },
+            { key: "b", text: "B. 堆疊長條圖" },
+            { key: "c", text: "C. 垂直長條圖" }
+          ],
+          ans: "a",
+          explanation: "🎉 <strong>答對了！</strong> 氣泡圖是散佈圖的延伸，以氣泡的「圓形面積」呈現第 3 個連續數值指標，注意面積不可誤用半徑對應數值。"
+        },
+        {
+          q: "<strong>情境 3：</strong> 資料庫裡有員工薪資、年資、工時、請假天數、績效等 <strong>6 個連續數值欄位</strong>，想全景快速掃描哪兩個變數連動最強，該用？",
+          options: [
+            { key: "a", text: "A. 畫 15 張長條圖慢慢看" },
+            { key: "b", text: "B. 相關係數熱力圖 (Correlation Heatmap)" },
+            { key: "c", text: "C. 堆疊面積圖" }
+          ],
+          ans: "b",
+          explanation: "🎉 <strong>答對了！</strong> 當有 3 個以上連續數值變數時，相關係數熱力圖以色彩矩陣全景展示兩兩變數的相關係數 (-1 到 +1)，一秒抓住關鍵關聯！"
+        }
+      ],
+      trend: [
+        {
+          q: "<strong>情境 1：</strong> 比較公司在 <strong>2021、2022、2023</strong> 三個年份的總營收，只有 3 個時間點，用什麼圖最穩重？",
+          options: [
+            { key: "a", text: "A. 折線圖（連成一條細線）" },
+            { key: "b", text: "B. 散佈圖（點三個點）" },
+            { key: "c", text: "C. 時間長條圖 (Time-series Bar)" }
+          ],
+          ans: "c",
+          explanation: "🎉 <strong>答對了！</strong> 時間點極少（僅 3～4 個年份或季度）時，長條圖比短短的折線更具穩重量體感，折線圖在點少時斜率會被過度放大！"
+        },
+        {
+          q: "<strong>情境 2：</strong> 追蹤官網過去 <strong>12 個月每日活躍用戶數 (DAU)</strong>，想觀察長期波動走勢與週末週期性循環，該選？",
+          options: [
+            { key: "a", text: "A. 折線圖 (Line Chart，X 軸嚴格按時間遞增)" },
+            { key: "b", text: "B. 水平長條圖（按 DAU 重新排序）" },
+            { key: "c", text: "C. 圓餅圖" }
+          ],
+          ans: "a",
+          explanation: "🎉 <strong>答對了！</strong> 時間序列較長（> 5 個時間點）時，折線圖透過斜率能最敏銳呈現波動趨勢；注意 X 軸必須按時間排序不可隨意打亂！"
+        },
+        {
+          q: "<strong>情境 3：</strong> 想看過去 2 年中，全公司總營收隨月份的增長走勢，並同時呈現「實體店面」與「電商通路」兩大通路的<strong>累積總體貢獻消長</strong>，該選？",
+          options: [
+            { key: "a", text: "A. 堆疊面積圖 (Stacked Area Chart)" },
+            { key: "b", text: "B. 散佈圖" },
+            { key: "c", text: "C. 箱形圖" }
+          ],
+          ans: "a",
+          explanation: "🎉 <strong>答對了！</strong> 堆疊面積圖適合展示少數類別（建議 ≤ 3 個）隨時間演進的累積量總和與結構變化，強調長期總體量感！"
+        }
+      ]
+    };
+
     // 初始化渲染
     function init() {
       setupTypeTabs();
       setupMatrixModal();
-      setupQuiz();
       renderCategory(currentCategory);
     }
 
@@ -1557,6 +1722,9 @@
 
       // 渲染卡片
       renderCards(catKey);
+
+      // 動態更新快問快答題庫
+      renderQuiz(catKey);
     }
 
     // 渲染卡片清單
@@ -1660,11 +1828,35 @@
       });
     }
 
-    // 互動小測驗邏輯
-    function setupQuiz() {
-      const cards = document.querySelectorAll(".quiz-card");
-      cards.forEach(card => {
-        const correctAns = card.dataset.ans;
+    // 動態渲染快問快答題目與綁定互動邏輯
+    function renderQuiz(catKey) {
+      const titleEl = document.getElementById("quizTitle");
+      const descEl = document.getElementById("quizDesc");
+      const grid = document.getElementById("quizGrid");
+      if (!grid) return;
+
+      const titleText = QUIZ_TITLES[catKey] || QUIZ_TITLES.all;
+      if (titleEl) titleEl.textContent = titleText;
+      const catName = CATEGORIES_INFO[catKey]?.title?.split(" ")[0] || "資料特徵";
+      if (descEl) descEl.textContent = `測試你在真實職場中，能否根據「${catName}」的資料特徵挑中正確圖表：`;
+
+      const questions = QUIZ_DATA[catKey] || QUIZ_DATA.all;
+
+      grid.innerHTML = questions.map((item, idx) => `
+        <div class="quiz-card" data-idx="${idx}">
+          <div class="quiz-q">${item.q}</div>
+          <div class="quiz-options">
+            ${item.options.map(opt => `
+              <button class="quiz-btn" data-choice="${opt.key}">${opt.text}</button>
+            `).join("")}
+          </div>
+          <div class="quiz-feedback"></div>
+        </div>
+      `).join("");
+
+      // 綁定各題選項點擊事件
+      grid.querySelectorAll(".quiz-card").forEach((card, idx) => {
+        const item = questions[idx];
         const btns = card.querySelectorAll(".quiz-btn");
         const fb = card.querySelector(".quiz-feedback");
 
@@ -1672,20 +1864,14 @@
           btn.addEventListener("click", () => {
             btns.forEach(b => b.classList.remove("correct", "wrong"));
             const choice = btn.dataset.choice;
-            if (choice === correctAns) {
+            if (choice === item.ans) {
               btn.classList.add("correct");
               fb.className = "quiz-feedback show correct-fb";
-              if (correctAns === "b") {
-                fb.innerHTML = "🎉 <strong>答對了！</strong> 項目多且文字長時，「水平長條圖」文字由左至右水平排列最好讀，千萬不要用垂直長條圖將文字旋轉 45 度！";
-              } else if (correctAns === "a") {
-                fb.innerHTML = "🎉 <strong>答對了！</strong> 「箱形圖」包含 Q1、中位數、Q3 與離群值，能一眼看穿極端薪資是否把平均拉高！";
-              } else if (correctAns === "c") {
-                fb.innerHTML = "🎉 <strong>答對了！</strong> 只有 3 個年份時，用「時間長條圖」比折線圖更加大方穩重，折線圖在時間點過少時會顯得空蕩且斜率被過度放大。";
-              }
+              fb.innerHTML = item.explanation;
             } else {
               btn.classList.add("wrong");
               fb.className = "quiz-feedback show wrong-fb";
-              fb.innerHTML = "❌ <strong>差一點點！</strong> 再想想看手邊的項目數量與標籤長度，或是觀察上面的圖表條件推薦！";
+              fb.innerHTML = "❌ <strong>差一點點！</strong> 再想想看手邊的項目數量、維度或特徵，也可參考上方卡片的適用條件建議！";
             }
           });
         });
